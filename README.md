@@ -2,6 +2,14 @@
 
 A library for integration test coverage analysis.
 
+## Running Tests
+
+To run tests with coverage data, run the following command:
+
+```shell
+mix test --cover
+```
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
