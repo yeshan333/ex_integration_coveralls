@@ -24,9 +24,23 @@ defmodule ExIntegrationCoveralls.CoverTest do
     Cover.stop()
   end
 
+  test "module path returns relative path for given path" do
+    assert(Cover.module_path(ExIntegrationCoveralls, ExIntegrationCoveralls.PathReader.base_path()) == "lib/ex_integration_coveralls.ex")
+    Cover.stop()
+  end
+
   test "get cover modules" do
     _cover_modules = Cover.compile(PathReader.expand_path("test/fixtures/beams/hello_ebin"))
-    assert(Cover.modules() == [Hello])
+    assert(Cover.modules(ExIntegrationCoveralls.PathReader.base_path() <> "/test/fixtures/beams/hello_ebin/hello.ex") == [Hello])
+    Cover.stop()
+  end
+
+  test "get cover modules (no source_lib_absolute_path param)" do
+    _cover_modules = Cover.compile(PathReader.expand_path("test/fixtures/beams/hello_ebin"))
+    assert capture_io(:stderr, fn ->
+      assert(Cover.modules() == [])
+    end) =~
+      "[warning] skipping the module 'Elixir.Hello' because source information for the module is not available."
     Cover.stop()
   end
 
