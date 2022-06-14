@@ -20,7 +20,7 @@ defmodule ExIntegrationCoveralls.Cover do
   end
 
   @doc """
-  Returns the relative file path of the specified module.
+  Returns the relative file path of the specified module for working directory.
   """
   def module_path(module) do
     module.module_info(:compile)[:source]
@@ -28,15 +28,28 @@ defmodule ExIntegrationCoveralls.Cover do
     |> Path.relative_to(ExIntegrationCoveralls.PathReader.base_path())
   end
 
+  @doc """
+  Returns the relative file path of the specified module.
+  """
+  def module_path(module, source_lib_absolute_path) do
+    module.module_info(:compile)[:source]
+    |> List.to_string()
+    |> Path.relative_to(source_lib_absolute_path)
+  end
+
   @doc "Wrapper for :cover.modules"
   def modules do
     :cover.modules() |> Enum.filter(&has_compile_info?/1)
   end
 
-  def has_compile_info?(module) do
+  def modules(module_source_absolute_path) do
+    :cover.modules() |> Enum.filter(fn module -> has_compile_info?(module, module_source_absolute_path) end)
+  end
+
+  def has_compile_info?(module, module_source_absolute_path \\ "") do
     with info when not is_nil(info) <- module.module_info(:compile),
          path when not is_nil(path) <- Keyword.get(info, :source),
-         true <- File.exists?(path) do
+         true <- File.exists?(path) || File.exists?(module_source_absolute_path) do
       true
     else
       _e ->
