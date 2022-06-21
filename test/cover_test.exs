@@ -4,11 +4,14 @@ defmodule ExIntegrationCoveralls.CoverTest do
   alias ExIntegrationCoveralls.Cover
   alias ExIntegrationCoveralls.PathReader
 
+  @source_file_path "test/fixtures/hello/lib/hello.ex"
+  @beam_file_path "test/fixtures/hello/beams/hello_ebin"
+
   test "start module beam files stub" do
     cover_module_stub_list = [ok: Hello]
 
     assert(
-      Cover.compile(PathReader.expand_path("test/fixtures/beams/hello_ebin")) ==
+      Cover.compile(PathReader.expand_path(@beam_file_path)) ==
         cover_module_stub_list
     )
 
@@ -34,12 +37,12 @@ defmodule ExIntegrationCoveralls.CoverTest do
   end
 
   test "get cover modules" do
-    _cover_modules = Cover.compile(PathReader.expand_path("test/fixtures/beams/hello_ebin"))
+    _cover_modules = Cover.compile(PathReader.expand_path(@beam_file_path))
 
     assert(
       Cover.modules(
-        ExIntegrationCoveralls.PathReader.base_path() <>
-          "/test/fixtures/beams/hello_ebin/hello.ex"
+        ExIntegrationCoveralls.PathReader.base_path() <> "/" <>
+          @source_file_path
       ) == [Hello]
     )
 
@@ -47,7 +50,7 @@ defmodule ExIntegrationCoveralls.CoverTest do
   end
 
   test "get cover modules (no source_lib_absolute_path param)" do
-    _cover_modules = Cover.compile(PathReader.expand_path("test/fixtures/beams/hello_ebin"))
+    _cover_modules = Cover.compile(PathReader.expand_path(@beam_file_path))
 
     assert(
       capture_io(:stderr, fn ->
@@ -65,7 +68,7 @@ defmodule ExIntegrationCoveralls.CoverTest do
   end
 
   test "get cover analyst, compiled module by cover" do
-    _cover_modules = Cover.compile(PathReader.expand_path("test/fixtures/beams/hello_ebin"))
+    _cover_modules = Cover.compile(PathReader.expand_path(@beam_file_path))
 
     expect =
       {:ok,
