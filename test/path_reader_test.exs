@@ -8,5 +8,6 @@ defmodule ExIntegrationCoveralls.PathReaderTest do
 
   test "expand path" do
     assert(PathReader.expand_path("test") == File.cwd!() <> "/test")
+    assert(PathReader.expand_path("test", File.cwd!()) == File.cwd!() <> "/test")
   end
 end

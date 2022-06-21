@@ -12,9 +12,9 @@ defmodule ExIntegrationCoveralls.PathReader do
   end
 
   @doc """
-  Expand path relative to the working directory.
+  Expand path relative to the base_path.
   """
-  def expand_path(path) do
-    Path.expand(path, base_path())
+  def expand_path(path, base_path \\ base_path()) do
+    Path.expand(path, base_path)
   end
 end
