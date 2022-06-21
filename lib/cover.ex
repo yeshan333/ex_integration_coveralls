@@ -29,7 +29,7 @@ defmodule ExIntegrationCoveralls.Cover do
   end
 
   @doc """
-  Returns the relative file path of the specified module.
+  Returns the relative file path of the specified module for source_lib_absolute_path.
   """
   def module_path(module, source_lib_absolute_path) do
     module.module_info(:compile)[:source]
@@ -43,7 +43,8 @@ defmodule ExIntegrationCoveralls.Cover do
   end
 
   def modules(module_source_absolute_path) do
-    :cover.modules() |> Enum.filter(fn module -> has_compile_info?(module, module_source_absolute_path) end)
+    :cover.modules()
+    |> Enum.filter(fn module -> has_compile_info?(module, module_source_absolute_path) end)
   end
 
   def has_compile_info?(module, module_source_absolute_path \\ "") do
