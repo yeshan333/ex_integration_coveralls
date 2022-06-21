@@ -7,7 +7,9 @@ A library for integration test coverage analysis.
 To run tests with coverage data, run the following command:
 
 ```shell
-mix test --cover
+mix test --cover --exclude real_cover
+# run all test cases
+mix test
 ```
 
 ## Installation

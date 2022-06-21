@@ -7,7 +7,8 @@ defmodule ExIntegrationCoveralls.CoverTest do
   @source_file_path "test/fixtures/hello/lib/hello.ex"
   @beam_file_path "test/fixtures/hello/beams/hello_ebin"
 
-  test "start module beam files stub" do
+  @tag :real_cover
+  test "start module beam ast code stub" do
     cover_module_stub_list = [ok: Hello]
 
     assert(
@@ -18,13 +19,13 @@ defmodule ExIntegrationCoveralls.CoverTest do
     Cover.stop()
   end
 
+  @tag :real_cover
   test "stop cover server" do
     assert(Cover.stop() == :ok)
   end
 
   test "module path returns relative path for working directory" do
     assert(Cover.module_path(ExIntegrationCoveralls) == "lib/ex_integration_coveralls.ex")
-    Cover.stop()
   end
 
   test "module path returns relative path for given path" do
@@ -32,10 +33,9 @@ defmodule ExIntegrationCoveralls.CoverTest do
       Cover.module_path(ExIntegrationCoveralls, ExIntegrationCoveralls.PathReader.base_path()) ==
         "lib/ex_integration_coveralls.ex"
     )
-
-    Cover.stop()
   end
 
+  @tag :real_cover
   test "get cover modules" do
     _cover_modules = Cover.compile(PathReader.expand_path(@beam_file_path))
 
@@ -50,6 +50,7 @@ defmodule ExIntegrationCoveralls.CoverTest do
     Cover.stop()
   end
 
+  @tag :real_cover
   test "get cover modules (no source_lib_absolute_path param)" do
     _cover_modules = Cover.compile(PathReader.expand_path(@beam_file_path))
 
@@ -64,10 +65,11 @@ defmodule ExIntegrationCoveralls.CoverTest do
   end
 
   test "get cover analyst, not compiled module by cover" do
-    expect = {:error, {:not_cover_compiled, TestMissing}}
-    assert Cover.analyze(TestMissing) == expect
+    expect = {:error, {:not_cover_compiled, Foo}}
+    assert Cover.analyze(Foo) == expect
   end
 
+  @tag :real_cover
   test "get cover analyst, compiled module by cover" do
     _cover_modules = Cover.compile(PathReader.expand_path(@beam_file_path))
 
