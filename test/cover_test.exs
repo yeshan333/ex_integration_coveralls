@@ -41,7 +41,8 @@ defmodule ExIntegrationCoveralls.CoverTest do
 
     assert(
       Cover.modules(
-        ExIntegrationCoveralls.PathReader.base_path() <> "/" <>
+        ExIntegrationCoveralls.PathReader.base_path() <>
+          "/" <>
           @source_file_path
       ) == [Hello]
     )
