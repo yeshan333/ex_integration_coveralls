@@ -96,4 +96,24 @@ defmodule ExIntegrationCoveralls.Stats do
     count = Map.get(hash, index, nil)
     do_generate_coverage(hash, index - 1, [count | acc])
   end
+
+  @doc """
+  Generate objects which stores source-file and coverage stats information.
+
+  ## Parameters
+  - coverage generate_coverage() return value
+
+  ## Returns
+  A map array.
+  \neg: [%{name: "lib/hello.ex", source: "defmodule Test do\\n  def test do\\n  end\\nend", [0, 1, nil, nil]}]
+  """
+  def generate_source_info(coverage, base_path \\ File.cwd!()) do
+    Enum.map(coverage, fn {file_path, stats} ->
+      %{
+        name: file_path,
+        source: read_source(PathReader.expand_path(file_path, base_path)),
+        coverage: stats
+      }
+    end)
+  end
 end
