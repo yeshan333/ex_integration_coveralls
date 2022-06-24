@@ -10,7 +10,11 @@ defmodule ExIntegrationCoveralls.StatsTest do
   @count_hash Enum.into([{1, 0}, {2, 1}], Map.new())
   @module_hash Enum.into([{"test/fixtures/test.ex", @count_hash}], Map.new())
   @counts [0, 1, nil, nil]
+  @trimmed "defmodule Test do\n  def test do\n  end\nend"
   @coverage [{"test/fixtures/test.ex", @counts}]
+  @source_info [
+    %{name: "test/fixtures/test.ex", source: @trimmed, coverage: @counts}
+  ]
 
   @calculate_stats %{"/private/tmp/hello/lib/hello.ex" => %{0 => 0, 16 => 0, 18 => 0, 20 => 0}}
   @calculate_stats_with_path %{"lib/hello.ex" => %{0 => 0, 16 => 0, 18 => 0, 20 => 0}}
@@ -132,5 +136,9 @@ defmodule ExIntegrationCoveralls.StatsTest do
     assert(generate_coverage == @module_source_info)
 
     Cover.stop()
+  end
+
+  test_with_mock "generate source info - mock", Cover, module_path: fn _ -> @source end do
+    assert(Stats.generate_source_info(@coverage) == @source_info)
   end
 end

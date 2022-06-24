@@ -1,6 +1,6 @@
 # ExIntegrationCoveralls
 
-A library for integration test coverage analysis.
+A library for integration test code line-level coverage analysis.
 
 ## Running Tests
 
