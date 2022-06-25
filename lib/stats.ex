@@ -10,6 +10,7 @@ defmodule ExIntegrationCoveralls.Stats do
     Stores count information for a file and all source lines.
     """
 
+    @derive [Poison.Encoder]
     defstruct filename: "", coverage: 0, sloc: 0, hits: 0, misses: 0, source: []
   end
 
@@ -18,6 +19,7 @@ defmodule ExIntegrationCoveralls.Stats do
     Stores count information and source for a single line.
     """
 
+    @derive [Poison.Encoder]
     defstruct coverage: nil, source: ""
   end
 

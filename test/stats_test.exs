@@ -26,17 +26,17 @@ defmodule ExIntegrationCoveralls.StatsTest do
   @source_transform_cov_result %{
     coverage: 50,
     files: [
-      %ExIntegrationCoveralls.Stats.Source{
+      %Stats.Source{
         coverage: 50,
         filename: "test/fixtures/test.ex",
         hits: 1,
         misses: 1,
         sloc: 2,
         source: [
-          %ExIntegrationCoveralls.Stats.Line{coverage: 0, source: "defmodule Test do"},
-          %ExIntegrationCoveralls.Stats.Line{coverage: 1, source: "  def test do"},
-          %ExIntegrationCoveralls.Stats.Line{coverage: nil, source: "  end"},
-          %ExIntegrationCoveralls.Stats.Line{coverage: nil, source: "end"}
+          %Stats.Line{coverage: 0, source: "defmodule Test do"},
+          %Stats.Line{coverage: 1, source: "  def test do"},
+          %Stats.Line{coverage: nil, source: "  end"},
+          %Stats.Line{coverage: nil, source: "end"}
         ]
       }
     ],
