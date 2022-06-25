@@ -25,6 +25,7 @@ defmodule ExIntegrationCoveralls.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:poison, "~> 5.0"},
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test}
     ]

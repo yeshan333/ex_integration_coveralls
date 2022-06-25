@@ -5,6 +5,22 @@ defmodule ExIntegrationCoveralls.Stats do
   alias ExIntegrationCoveralls.Cover
   alias ExIntegrationCoveralls.PathReader
 
+  defmodule Source do
+    @moduledoc """
+    Stores count information for a file and all source lines.
+    """
+
+    defstruct filename: "", coverage: 0, sloc: 0, hits: 0, misses: 0, source: []
+  end
+
+  defmodule Line do
+    @moduledoc """
+    Stores count information and source for a single line.
+    """
+
+    defstruct coverage: nil, source: ""
+  end
+
   @doc """
   Calculate the statistical information for the specified list of modules.
   It uses :cover.analyse for getting the information.
@@ -14,7 +30,13 @@ defmodule ExIntegrationCoveralls.Stats do
 
   ## Returns
   a Map stores the number of executions of executable line in the source file.
-  \neg: %{"test/fixtures/test1.ex" => %{1 => 0, 2 => 1}, "test/fixtures/test2.ex" => %{1 => 0, 2 => 0}}
+
+  ## Examples
+
+      %{
+        "test/fixtures/test1.ex" => %{1 => 0, 2 => 1},
+        "test/fixtures/test2.ex" => %{1 => 0, 2 => 0}
+      }
   """
   def calculate_stats(modules, source_lib_absolute_path \\ File.cwd!()) do
     Enum.reduce(modules, Map.new(), fn module, dict ->
@@ -79,7 +101,10 @@ defmodule ExIntegrationCoveralls.Stats do
   The second element of the tuple stores the number of times each row was executed.
   The nil means it's not an executable line.
   Non-negative numbers represent the number of times each line  of source code is executed.
-  \neg: [{"lib/hello.ex", [ nil, 0, nil, 0, nil, 1]}, ...]
+
+  ## Examples
+
+      [{"lib/hello.ex", [ nil, 0, nil, 0, nil, 1]}, ...]
   """
   def generate_coverage(hash, base_path \\ File.cwd!()) do
     keys = Map.keys(hash)
@@ -101,11 +126,21 @@ defmodule ExIntegrationCoveralls.Stats do
   Generate objects which stores source-file and coverage stats information.
 
   ## Parameters
-  - coverage generate_coverage() return value
+  - coverage: generate_coverage() return value
 
   ## Returns
   A map array.
-  \neg: [%{name: "lib/hello.ex", source: "defmodule Test do\\n  def test do\\n  end\\nend", [0, 1, nil, nil]}]
+
+  ## Examples
+  Return value link this:
+
+      [
+        %{
+          coverage: [0, 1, nil, nil],
+          name: "lib/hello.ex",
+          source: "defmodule Test do\\n  def test do\\n  end\\nend"
+        }
+      ]
   """
   def generate_source_info(coverage, base_path \\ File.cwd!()) do
     Enum.map(coverage, fn {file_path, stats} ->
@@ -115,5 +150,102 @@ defmodule ExIntegrationCoveralls.Stats do
         coverage: stats
       }
     end)
+  end
+
+  @doc """
+  Organize coverage data in a human-readable way.
+
+  ## Parameters
+  - stats: generate_source_info() return value
+
+  ## Return
+  A map.
+
+  ## Examples
+  Return value link this:
+
+      %{
+        coverage: 50,
+        files: [
+          %ExIntegrationCoveralls.Stats.Source{
+            coverage: 50,
+            filename: "test/fixtures/test.ex",
+            hits: 1,
+            misses: 1,
+            sloc: 2,
+            source: [
+              %ExIntegrationCoveralls.Stats.Line{coverage: 0, source: "defmodule Test do"},
+              %ExIntegrationCoveralls.Stats.Line{coverage: 1, source: "  def test do"},
+              %ExIntegrationCoveralls.Stats.Line{coverage: nil, source: "  end"},
+              %ExIntegrationCoveralls.Stats.Line{coverage: nil, source: "end"}
+            ]
+          }
+        ],
+        hits: 1,
+        misses: 1,
+        sloc: 2
+      }
+  """
+  def transform_cov(stats) do
+    stats = Enum.sort(stats, fn x, y -> x[:name] <= y[:name] end)
+
+    files = Enum.map(stats, &populate_file/1)
+    {relevant, hits, misses} = Enum.reduce(files, {0, 0, 0}, &reduce_file_counts/2)
+    covered = relevant - misses
+
+    %{
+      coverage: get_coverage(relevant, covered),
+      sloc: relevant,
+      hits: hits,
+      misses: misses,
+      files: files
+    }
+  end
+
+  defp populate_file(stat) do
+    coverage = stat[:coverage]
+    source = map_source(stat[:source], coverage)
+    relevant = Enum.count(coverage, fn e -> e != nil end)
+    hits = Enum.reduce(coverage, 0, fn e, acc -> (e || 0) + acc end)
+    misses = Enum.count(coverage, fn e -> e == 0 end)
+    covered = relevant - misses
+
+    %Source{
+      filename: stat[:name],
+      coverage: get_coverage(relevant, covered),
+      sloc: relevant,
+      hits: hits,
+      misses: misses,
+      source: source
+    }
+  end
+
+  defp map_source(source, coverage) do
+    source
+    |> String.split("\n")
+    |> Enum.with_index()
+    |> Enum.map(&populate_source(&1, coverage))
+  end
+
+  defp populate_source({line, i}, coverage) do
+    %Line{coverage: Enum.at(coverage, i), source: line}
+  end
+
+  defp get_coverage(relevant, covered) do
+    value =
+      case relevant do
+        0 -> 100.0
+        _ -> covered / relevant * 100
+      end
+
+    if value == trunc(value) do
+      trunc(value)
+    else
+      Float.round(value, 1)
+    end
+  end
+
+  defp reduce_file_counts(%{sloc: sloc, hits: hits, misses: misses}, {s, h, m}) do
+    {s + sloc, h + hits, m + misses}
   end
 end
