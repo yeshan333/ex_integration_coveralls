@@ -15,7 +15,8 @@ defmodule ExIntegrationCoveralls.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :tools]
+      extra_applications: [:logger, :tools],
+      application: [:httpoison]
     ]
   end
 
@@ -26,6 +27,7 @@ defmodule ExIntegrationCoveralls.MixProject do
   defp deps do
     [
       {:poison, "~> 5.0"},
+      {:httpoison, "~> 1.8"},
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test}
     ]
