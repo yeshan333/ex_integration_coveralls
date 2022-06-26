@@ -24,6 +24,30 @@ defmodule ExIntegrationCoveralls.Stats do
   end
 
   @doc """
+  Report the statistical information for the specified module.
+
+  ## Parameters
+  - compile_time_source_lib_abs_path: source code project abs path in compile-time machine.
+  - source_lib_absolute_path: source code project abs path in run-time machine.
+
+  ## Returns
+  Return value like this:
+
+      [
+        %{
+          coverage: [0, 1, nil, nil],
+          name: "lib/hello.ex",
+          source: "defmodule Test do\\n  def test do\\n  end\\nend"
+        }
+      ]
+  """
+  def report(modules, compile_time_source_lib_abs_path, source_lib_absolute_path) do
+    calculate_stats(modules, compile_time_source_lib_abs_path)
+    |> generate_coverage(source_lib_absolute_path)
+    |> generate_source_info(source_lib_absolute_path)
+  end
+
+  @doc """
   Calculate the statistical information for the specified list of modules.
   It uses :cover.analyse for getting the information.
 
@@ -134,7 +158,7 @@ defmodule ExIntegrationCoveralls.Stats do
   A map array.
 
   ## Examples
-  Return value link this:
+  Return value like this:
 
       [
         %{

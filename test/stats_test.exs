@@ -135,6 +135,17 @@ defmodule ExIntegrationCoveralls.StatsTest do
   }
 
   @tag :real_cover
+  test "get coverage report" do
+    _cover_modules_status = Cover.compile(PathReader.expand_path(@beam_file_path))
+
+    stats =
+      Cover.modules(PathReader.expand_path(@beam_file_path))
+      |> Stats.report("/private/tmp/hello", @source_code_project_base_path)
+
+    assert(stats == @module_source_info)
+  end
+
+  @tag :real_cover
   test "calculate stats" do
     _cover_modules_status = Cover.compile(PathReader.expand_path(@beam_file_path))
 
