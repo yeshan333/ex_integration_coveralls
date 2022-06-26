@@ -1,6 +1,8 @@
 defmodule ExIntegrationCoveralls.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/yeshan333/ex_integration_coveralls"
+
   def project do
     [
       app: :ex_integration_coveralls,
@@ -8,7 +10,10 @@ defmodule ExIntegrationCoveralls.MixProject do
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package(),
+      name: "ExIntegrationCoveralls",
+      description: description()
     ]
   end
 
@@ -30,6 +35,21 @@ defmodule ExIntegrationCoveralls.MixProject do
       {:httpoison, "~> 1.8"},
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test}
+    ]
+  end
+
+  defp description() do
+    "A library for integration test code line-level coverage analysis."
+  end
+
+  defp package do
+    [
+      maintainers: ["yeshan333"],
+      licenses: ["MIT"],
+      links: %{
+        "Changelog" => @source_url <> "/blob/main/CHANGELOG.md",
+        "GitHub" => @source_url
+      }
     ]
   end
 end
