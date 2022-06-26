@@ -13,7 +13,12 @@ defmodule ExIntegrationCoveralls.MixProject do
       deps: deps(),
       package: package(),
       name: "ExIntegrationCoveralls",
-      description: description()
+      description: description(),
+      homepage_url: @source_url,
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -34,7 +39,8 @@ defmodule ExIntegrationCoveralls.MixProject do
       {:poison, "~> 5.0"},
       {:httpoison, "~> 1.8"},
       {:meck, "~> 0.8", only: :test},
-      {:mock, "~> 0.3.6", only: :test}
+      {:mock, "~> 0.3.6", only: :test},
+      {:ex_doc, "~> 0.18", only: :dev},
     ]
   end
 
