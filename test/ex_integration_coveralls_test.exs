@@ -41,6 +41,10 @@ defmodule ExIntegrationCoverallsTest do
     assert ExIntegrationCoveralls.exit() == :ok
   end
 
+  test_with_mock "reset coverage data ", Cover, reset: fn -> :ok end do
+    assert ExIntegrationCoveralls.reset_coverage_data() == :ok
+  end
+
   test_with_mock "get total coverage rate", Stats,
     report: fn _, _, _ -> @stats_report end,
     transform_cov: fn _ -> @source_transform_cov_result end do

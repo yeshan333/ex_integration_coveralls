@@ -13,6 +13,10 @@ defmodule ExIntegrationCoveralls do
     Cover.stop()
   end
 
+  def reset_coverage_data do
+    Cover.reset()
+  end
+
   @doc """
   Get an overall integration test coverage rate of an OTP application
 

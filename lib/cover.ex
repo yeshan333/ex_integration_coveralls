@@ -20,6 +20,13 @@ defmodule ExIntegrationCoveralls.Cover do
   end
 
   @doc """
+  Reset all coverage data
+  """
+  def reset() do
+    :cover.reset()
+  end
+
+  @doc """
   Returns the relative file path of the specified module for working directory.
   """
   def module_path(module) do
