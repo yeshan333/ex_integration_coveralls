@@ -4,6 +4,7 @@ defmodule ExIntegrationCoveralls do
   """
   alias ExIntegrationCoveralls.Cover
   alias ExIntegrationCoveralls.Stats
+  alias ExIntegrationCoveralls.CoverageCiPoster
 
   def execute(compiled_beam_dir_path) do
     Cover.compile(compiled_beam_dir_path)
@@ -78,5 +79,23 @@ defmodule ExIntegrationCoveralls do
       |> Stats.transform_cov()
 
     stats
+  end
+
+  @doc """
+  Post coverage stats to User-Domain Cover CI Service.
+
+  ## Parameters
+  - url: CI receive stats address
+  - extends_post_params: use to transform stats which CI service can acceptable form
+  - compile_time_source_lib_abs_path: source code project abs path in compile-time machine.
+  - source_lib_absolute_path: source code project abs path in run-time machine.
+  """
+  def post_cov_stats_to_ud_ci(
+    url,
+    extends_post_params,
+    compile_time_source_lib_abs_path \\ File.cwd!(),
+    source_code_abs_path \\ File.cwd!()
+  ) do
+    CoverageCiPoster.post_stats_to_cover_ci(url, extends_post_params, compile_time_source_lib_abs_path, source_code_abs_path)
   end
 end

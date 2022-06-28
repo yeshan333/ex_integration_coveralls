@@ -34,26 +34,26 @@ defmodule ExIntegrationCoverallsTest do
   }
 
   test_with_mock "execute coverage", Cover, compile: fn _ -> [ok: Bar] end do
-    assert ExIntegrationCoveralls.execute("fake/beams/path") == [ok: Bar]
+    assert(ExIntegrationCoveralls.execute("fake/beams/path") == [ok: Bar])
   end
 
   test_with_mock "stop cover", Cover, stop: fn -> :ok end do
-    assert ExIntegrationCoveralls.exit() == :ok
+    assert(ExIntegrationCoveralls.exit() == :ok)
   end
 
   test_with_mock "reset coverage data ", Cover, reset: fn -> :ok end do
-    assert ExIntegrationCoveralls.reset_coverage_data() == :ok
+    assert(ExIntegrationCoveralls.reset_coverage_data() == :ok)
   end
 
   test_with_mock "get total coverage rate", Stats,
     report: fn _, _, _ -> @stats_report end,
     transform_cov: fn _ -> @source_transform_cov_result end do
-    assert ExIntegrationCoveralls.get_total_coverage() == 50
+    assert(ExIntegrationCoveralls.get_total_coverage() == 50)
   end
 
   test_with_mock "get total coverage analysis report", Stats,
     report: fn _, _, _ -> @stats_report end,
     transform_cov: fn _ -> @source_transform_cov_result end do
-    assert ExIntegrationCoveralls.get_coverage_report() == @source_transform_cov_result
+    assert(ExIntegrationCoveralls.get_coverage_report() == @source_transform_cov_result)
   end
 end
