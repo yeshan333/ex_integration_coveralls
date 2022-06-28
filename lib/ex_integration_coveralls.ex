@@ -65,13 +65,14 @@ defmodule ExIntegrationCoveralls do
 
   """
   def get_coverage_report(
-    compile_time_source_lib_abs_path \\ File.cwd!(),
-    source_code_abs_path \\ File.cwd!()
-  ) do
+        compile_time_source_lib_abs_path \\ File.cwd!(),
+        source_code_abs_path \\ File.cwd!()
+      ) do
     stats =
       Cover.modules(source_code_abs_path)
       |> Stats.report(compile_time_source_lib_abs_path, source_code_abs_path)
       |> Stats.transform_cov()
+
     stats
   end
 end

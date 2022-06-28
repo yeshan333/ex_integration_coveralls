@@ -2,6 +2,7 @@ defmodule ExIntegrationCoverallsTest do
   use ExUnit.Case
   import Mock
   alias ExIntegrationCoveralls.Stats
+  alias ExIntegrationCoveralls.Cover
 
   @stats_report [
     %{
@@ -31,6 +32,14 @@ defmodule ExIntegrationCoverallsTest do
     misses: 1,
     sloc: 2
   }
+
+  test_with_mock "execute coverage", Cover, compile: fn _ -> [ok: Bar] end do
+    assert ExIntegrationCoveralls.execute("fake/beams/path") == [ok: Bar]
+  end
+
+  test_with_mock "stop cover", Cover, stop: fn -> :ok end do
+    assert ExIntegrationCoveralls.exit() == :ok
+  end
 
   test_with_mock "get total coverage rate", Stats,
     report: fn _, _, _ -> @stats_report end,

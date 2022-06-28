@@ -40,7 +40,7 @@ defmodule ExIntegrationCoveralls.MixProject do
       {:httpoison, "~> 1.8"},
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test},
-      {:ex_doc, "~> 0.18", only: :dev},
+      {:ex_doc, "~> 0.18", only: :dev}
     ]
   end
 
