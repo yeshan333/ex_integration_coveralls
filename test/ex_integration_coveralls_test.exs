@@ -32,9 +32,15 @@ defmodule ExIntegrationCoverallsTest do
     sloc: 2
   }
 
-  test_with_mock "get integration total coverage", Stats,
+  test_with_mock "get total coverage rate", Stats,
     report: fn _, _, _ -> @stats_report end,
     transform_cov: fn _ -> @source_transform_cov_result end do
     assert ExIntegrationCoveralls.get_total_coverage() == 50
+  end
+
+  test_with_mock "get total coverage analysis report", Stats,
+    report: fn _, _, _ -> @stats_report end,
+    transform_cov: fn _ -> @source_transform_cov_result end do
+    assert ExIntegrationCoveralls.get_coverage_report() == @source_transform_cov_result
   end
 end
