@@ -6,7 +6,7 @@ defmodule ExIntegrationCoveralls.MixProject do
   def project do
     [
       app: :ex_integration_coveralls,
-      version: "0.2.0",
+      version: "0.3.0",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -22,7 +22,6 @@ defmodule ExIntegrationCoveralls.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger, :tools],
@@ -33,7 +32,6 @@ defmodule ExIntegrationCoveralls.MixProject do
   defp elixirc_paths(:test), do: ["lib", "test/fixtures/test_missing.ex"]
   defp elixirc_paths(_), do: ["lib"]
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:poison, "~> 5.0"},
