@@ -18,8 +18,21 @@ defmodule ExIntegrationCoveralls.MixProject do
       docs: [
         main: "readme",
         extras: ["README.md"]
-      ]
+      ],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env:
+        cli_env_for(:test, [
+          "coveralls",
+          "coveralls.detail",
+          "coveralls.html",
+          "coveralls.json",
+          "coveralls.post"
+        ])
     ]
+  end
+
+  defp cli_env_for(env, tasks) do
+    Enum.reduce(tasks, [], fn key, acc -> Keyword.put(acc, :"#{key}", env) end)
   end
 
   def application do
@@ -38,7 +51,8 @@ defmodule ExIntegrationCoveralls.MixProject do
       {:httpoison, "~> 1.8"},
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test},
-      {:ex_doc, "~> 0.18", only: :dev}
+      {:ex_doc, "~> 0.18", only: :dev},
+      {:excoveralls, "~> 0.13", only: :test}
     ]
   end
 
