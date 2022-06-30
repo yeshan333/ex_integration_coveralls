@@ -14,8 +14,10 @@ defmodule ExIntegrationCoveralls.PathReaderTest do
     assert(PathReader.expand_path("test", File.cwd!()) == File.cwd!() <> "/test")
   end
 
-  test_with_mock "get app cover path", Application, app_dir: fn _  -> PathReader.expand_path(@application_dir) end do
-    { run_time_source_lib_abs_path , compile_time_source_lib_abs_path, app_beam_dir } = PathReader.get_app_cover_path("ex_integration_coveralls")
+  test_with_mock "get app cover path", Application,
+    app_dir: fn _ -> PathReader.expand_path(@application_dir) end do
+    {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, app_beam_dir} =
+      PathReader.get_app_cover_path("ex_integration_coveralls")
 
     assert(run_time_source_lib_abs_path == PathReader.expand_path("test/fixtures/hello"))
     assert(compile_time_source_lib_abs_path == "/private/tmp/hello")
