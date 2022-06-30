@@ -5,7 +5,7 @@ defmodule ExIntegrationCoveralls.CoverTest do
   alias ExIntegrationCoveralls.PathReader
 
   @source_file_path "test/fixtures/hello/lib/hello.ex"
-  @beam_file_path "test/fixtures/hello/beams/hello_ebin"
+  @beam_file_path "test/fixtures/hello/ebin"
 
   @tag :real_cover
   test "start module beam ast code stub" do

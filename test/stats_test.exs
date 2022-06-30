@@ -53,7 +53,7 @@ defmodule ExIntegrationCoveralls.StatsTest do
   @calculate_stats_with_path %{"lib/hello.ex" => %{0 => 0, 16 => 0, 18 => 0, 20 => 0}}
   @source_file_path "test/fixtures/hello/lib/hello.ex"
   @source_content "defmodule Hello do\n  @moduledoc \"\"\"\n  Documentation for `Hello`.\n  \"\"\"\n\n  @doc \"\"\"\n  Hello world.\n\n  ## Examples\n\n      iex> Hello.hello()\n      :world\n\n  \"\"\"\n  def hello do\n    File.cwd!()\n    :world\n    File.cwd!()\n    :hello\n    File.cwd!()\n    :world\n  end\nend"
-  @beam_file_path "test/fixtures/hello/beams/hello_ebin"
+  @beam_file_path "test/fixtures/hello/ebin"
   @source_code_project_base_path PathReader.expand_path("test/fixtures/hello")
   @module_line_cover_counts [
     nil,

@@ -20,7 +20,7 @@ by adding `ex_integration_coveralls` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ex_integration_coveralls, "~> 0.1.0"}
+    {:ex_integration_coveralls, "~> 0.4.0"}
   ]
 end
 ```
