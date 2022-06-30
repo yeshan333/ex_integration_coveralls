@@ -22,12 +22,13 @@ defmodule ExIntegrationCoveralls.PathReader do
   Get application cover path.
 
   ## Parameters
+  - appname: application name in run-time environment. It is a string
   """
   def get_app_cover_path(appname) do
     app_dir = Application.app_dir(String.to_existing_atom(appname))
     app_beam_dir = app_dir <> "/ebin"
 
-    beam_file_path_list = File.ls!(app_dir <> "/ebin")
+    beam_file_path_list = File.ls!(app_beam_dir)
     beam_file_path = List.first(beam_file_path_list)
     beam_file_abs_path = app_beam_dir <> "/" <> beam_file_path
 
@@ -38,6 +39,6 @@ defmodule ExIntegrationCoveralls.PathReader do
 
     compile_time_source_lib_abs_path = List.first(String.split(compile_time_abs_path, "/" <> spliter))
 
-    { app_dir, compile_time_source_lib_abs_path }
+    { app_dir, compile_time_source_lib_abs_path, app_beam_dir }
   end
 end

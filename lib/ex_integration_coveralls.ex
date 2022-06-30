@@ -5,6 +5,13 @@ defmodule ExIntegrationCoveralls do
   alias ExIntegrationCoveralls.Cover
   alias ExIntegrationCoveralls.Stats
   alias ExIntegrationCoveralls.CoverageCiPoster
+  alias ExIntegrationCoveralls.PathReader
+
+  # def start_cov(app_name) do
+  #   { run_time_source_lib_abs_path , compile_time_source_lib_abs_path } = PathReader.get_app_cover_path(app_name)
+  #   cover_beam_dir = run_time_source_lib_abs_path <> "/ebin"
+  #   execute()
+  # end
 
   def execute(compiled_beam_dir_path) do
     Cover.compile(compiled_beam_dir_path)
