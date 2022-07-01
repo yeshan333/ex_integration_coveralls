@@ -38,7 +38,8 @@ defmodule ExIntegrationCoveralls.MixProject do
   def application do
     [
       extra_applications: [:logger, :tools],
-      application: [:httpoison]
+      application: [:httpoison],
+      mod: {ExIntegrationCoveralls.Application, []}
     ]
   end
 
@@ -49,6 +50,7 @@ defmodule ExIntegrationCoveralls.MixProject do
     [
       {:poison, "~> 5.0"},
       {:httpoison, "~> 1.8"},
+      {:plug_cowboy, "~> 2.5"},
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test},
       {:ex_doc, "~> 0.18", only: :dev},

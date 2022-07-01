@@ -57,7 +57,7 @@ defmodule ExIntegrationCoveralls.CoverageCiPoster do
   ## Parameters
   - stats: get_coverage_stats() return value
   """
-  def stats_transformer(stats, extends) do
+  def stats_transformer(stats, extends \\ %{}) do
     # %{"lib/hello.ex" => %{ 1 => 3, 2 => 0, 3 => 1}}
     files_map =
       Enum.map(stats, fn item ->
