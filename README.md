@@ -1,5 +1,7 @@
 # ExIntegrationCoveralls
 
+[![Coverage Status](https://coveralls.io/repos/github/yeshan333/ex_integration_coveralls/badge.svg?branch=refs/tags/0.4.0)](https://coveralls.io/github/yeshan333/ex_integration_coveralls?branch=refs/tags/0.4.0) [![hex.pm version](https://img.shields.io/hexpm/v/ex_integration_coveralls.svg)](https://hex.pm/packages/ex_integration_coveralls) [![hex.pm downloads](https://img.shields.io/hexpm/dt/ex_integration_coveralls.svg)](https://hex.pm/packages/ex_integration_coveralls) [![hex.pm license](https://img.shields.io/hexpm/l/ex_integration_coveralls.svg)](https://coveralls.io/github/yeshan333/ex_integration_coveralls/blog/main/LICENSEs)
+
 A library for run-time system code line-level coverage analysis. You can use it to evulate the intergration test coverage.
 
 > realistic practice: https://github.com/yeshan333/explore_ast_app/blob/main/examples/README.md
