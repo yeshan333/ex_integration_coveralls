@@ -5,7 +5,10 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   plug :dispatch
 
   get "/stats" do
-    resp = ExIntegrationCoveralls.get_app_total_cov("explore_ast_app")
+    stats = ExIntegrationCoveralls.get_app_total_cov("explore_ast_app")
+    resp = ExIntegrationCoveralls.Json.generate_json_output(%{
+      coverage: stats
+    })
     send_resp(conn, 200, resp)
   end
 
