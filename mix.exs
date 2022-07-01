@@ -6,7 +6,7 @@ defmodule ExIntegrationCoveralls.MixProject do
   def project do
     [
       app: :ex_integration_coveralls,
-      version: "0.5.0",
+      version: "0.5.1",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -50,7 +50,7 @@ defmodule ExIntegrationCoveralls.MixProject do
     [
       {:poison, "~> 5.0"},
       {:httpoison, "~> 1.8"},
-      {:plug_cowboy, "~> 2.5"},
+      {:plug_cowboy, "~> 2.0"},
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test},
       {:ex_doc, "~> 0.18", only: :dev},
