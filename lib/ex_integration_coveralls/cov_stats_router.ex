@@ -2,6 +2,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   use Plug.Router
 
   plug :match
+  plug Plug.Parsers, parsers: [:json], json_decoder: Poison
   plug :dispatch
 
   get "/stats" do
