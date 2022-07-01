@@ -22,7 +22,7 @@ defmodule ExIntegrationCoveralls.Application do
         listen_port: 3333
       })
 
-    cowboy_optsions = [
+    cowboy_options = [
       port: http_cfg.listen_port,
       ip: http_cfg.listen_ip
     ]
@@ -30,7 +30,7 @@ defmodule ExIntegrationCoveralls.Application do
     Plug.Cowboy.child_spec(
       scheme: :http,
       plug: CovStatsRouter,
-      options: cowboy_optsions
+      options: cowboy_options
     )
   end
 end
