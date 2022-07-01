@@ -52,9 +52,6 @@ defmodule ExIntegrationCoveralls do
     )
   end
 
-  def get_app_cov_report(app_name) do
-  end
-
   def execute(compiled_beam_dir_path) do
     Cover.compile(compiled_beam_dir_path)
   end
