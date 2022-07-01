@@ -1,6 +1,6 @@
 defmodule ExIntegrationCoveralls.Application do
   @moduledoc """
-
+  Start a http worker to expose coverage stats.
   """
 
   use Application
