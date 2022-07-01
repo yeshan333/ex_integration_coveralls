@@ -23,7 +23,7 @@ The package can be installed by adding `ex_integration_coveralls` to your list o
 ```elixir
 def deps do
   [
-    {:ex_integration_coveralls, "~> 0.4.0"}
+    {:ex_integration_coveralls, "~> 0.5.0"}
   ]
 end
 ```

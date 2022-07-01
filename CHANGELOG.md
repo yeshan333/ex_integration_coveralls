@@ -1,4 +1,26 @@
 
+<a name="0.5.0"></a>
+## [0.5.0](https://github.com/yeshan333/ex_integration_coveralls/compare/0.4.0...0.5.0) (2022-07-01)
+
+### Chore
+
+* **ci:** allow manual trigger github action
+
+### Docs
+
+* add CHANGLOG
+* **README:** update coverage badge
+* **README:** add ci badges
+
+### Feat
+
+* expose coverage data by http worker ([#1](https://github.com/yeshan333/ex_integration_coveralls/issues/1))
+
+### Release
+
+* 0.5.0
+
+
 <a name="0.4.0"></a>
 ## 0.4.0 (2022-06-30)
 
