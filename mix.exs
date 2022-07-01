@@ -57,7 +57,7 @@ defmodule ExIntegrationCoveralls.MixProject do
   end
 
   defp description() do
-    "A library for integration test code line-level coverage analysis."
+    "A library for run-time system code line-level coverage analysis. You can use it to evulate the intergration test coverage."
   end
 
   defp package do
