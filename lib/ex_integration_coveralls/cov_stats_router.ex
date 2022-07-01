@@ -1,35 +1,35 @@
 defmodule ExIntegrationCoveralls.CovStatsRouter do
   use Plug.Router
-  require Logger
   alias ExIntegrationCoveralls.Json
   alias ExIntegrationCoveralls.PathReader
   alias ExIntegrationCoveralls.CoverageCiPoster
 
-  plug :match
-  plug Plug.Parsers, parsers: [:json], json_decoder: Poison
-  plug :dispatch
+  plug(:match)
+  plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
+  plug(:dispatch)
 
   get "/ping" do
     send_resp(conn, 200, "pong!")
   end
 
   post "/cov/start" do
-    {status, body} =
+    {status, _} =
       case conn.body_params do
         %{"app_name" => app_name} -> {200, ExIntegrationCoveralls.start_app_cov(app_name)}
-        _ -> {400, "bad request"}
+        _ -> {400, "bad request!"}
       end
 
-    send_resp(conn, status, Json.generate_json_output(body))
+    send_resp(conn, status, "OK")
   end
 
   get "/cov/total/:app_name" do
     total_cov = ExIntegrationCoveralls.get_app_total_cov(app_name)
-    body = Json.generate_json_output(%{
-      coverage: total_cov
-    })
 
-    Logger.info("stats: #{inspect(total_cov)}, resp: #{body}")
+    body =
+      Json.generate_json_output(%{
+        coverage: total_cov
+      })
+
     send_resp(conn, 200, body)
   end
 
@@ -38,8 +38,11 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
       PathReader.get_app_cover_path(app_name)
 
     stats =
-      CoverageCiPoster.get_coverage_stats(compile_time_source_lib_abs_path, run_time_source_lib_abs_path)
-      |> CoverageCiPoster.stats_transformer
+      CoverageCiPoster.get_coverage_stats(
+        compile_time_source_lib_abs_path,
+        run_time_source_lib_abs_path
+      )
+      |> CoverageCiPoster.stats_transformer()
 
     body = Json.generate_json_output(stats)
     send_resp(conn, 200, body)
