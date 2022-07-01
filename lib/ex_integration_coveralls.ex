@@ -1,6 +1,6 @@
 defmodule ExIntegrationCoveralls do
   @moduledoc """
-  Documentation for `ExIntegrationCoveralls`.
+  Run-time system code line-level coverage analysis.
   """
   alias ExIntegrationCoveralls.Cover
   alias ExIntegrationCoveralls.Stats

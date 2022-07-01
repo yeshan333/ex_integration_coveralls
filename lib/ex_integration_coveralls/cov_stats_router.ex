@@ -1,4 +1,7 @@
 defmodule ExIntegrationCoveralls.CovStatsRouter do
+  @moduledoc """
+  Expose coverage stats by http endpoints.
+  """
   use Plug.Router
   alias ExIntegrationCoveralls.Json
   alias ExIntegrationCoveralls.PathReader
