@@ -35,6 +35,11 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
     ],
     status_code: 200
   }
+  @run_time_source_lib_abs_path PathReader.expand_path("test/fixtures/hello")
+  @compile_time_source_lib_abs_path "/private/tmp/hello"
+  @app_beam_dir PathReader.expand_path("test/fixtures/hello/ebin")
+  @app_cover_path {@run_time_source_lib_abs_path, @compile_time_source_lib_abs_path,
+                   @app_beam_dir}
 
   test "ping" do
     conn =
@@ -147,6 +152,36 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert conn.resp_body == "OK"
+    end
+  end
+
+  describe "get app commit id" do
+    test "unkunow_app" do
+      assert_raise Plug.Conn.WrapperError, fn ->
+        :get
+        |> conn("/cov/commit_id/unkunow_app", "")
+        |> CovStatsRouter.call(@opts)
+      end
+    end
+
+    test "foo app commit id" do
+      with_mocks([
+        {PathReader, [],
+         [
+           get_app_cover_path: fn _ -> @app_cover_path end,
+           expand_path: fn _, _ -> @run_time_source_lib_abs_path <> "/VERSION_INFO" end,
+           get_commit_id_from_file: fn _ -> "43a9595" end
+         ]}
+      ]) do
+        conn =
+          :get
+          |> conn("/cov/commit_id/foo", "")
+          |> CovStatsRouter.call(@opts)
+
+        assert conn.state == :sent
+        assert conn.status == 200
+        assert conn.resp_body == "{\"commit_id\":\"43a9595\",\"app_name\":\"foo\"}"
+      end
     end
   end
 

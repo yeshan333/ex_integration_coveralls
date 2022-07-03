@@ -71,4 +71,13 @@ defmodule ExIntegrationCoveralls.PathReaderTest do
       assert(app_beam_dir == PathReader.expand_path("test/fixtures/hello/ebin"))
     end
   end
+
+  test "read commit id" do
+    commit_id =
+      PathReader.get_commit_id_from_file(
+        PathReader.expand_path(@application_dir <> "/VERSION_INFO")
+      )
+
+    assert(commit_id == "43a9595")
+  end
 end
