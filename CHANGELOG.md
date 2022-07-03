@@ -1,10 +1,18 @@
 
+<a name="0.6.0"></a>
+## [0.6.0](https://github.com/yeshan333/ex_integration_coveralls/compare/0.5.0...0.6.0) (2022-07-02)
+
+### Feat
+
+* add upload coverage trigger (http endpoint) ([#2](https://github.com/yeshan333/ex_integration_coveralls/issues/2))
+
+
 <a name="0.5.0"></a>
 ## [0.5.0](https://github.com/yeshan333/ex_integration_coveralls/compare/0.4.0...0.5.0) (2022-07-01)
 
 ### Chore
 
-* **ci:** allow manual trigger github action
+* **ci:** allow manual triiger github action
 
 ### Docs
 

@@ -44,4 +44,14 @@ defmodule ExIntegrationCoveralls.PathReader do
 
     {app_dir, compile_time_source_lib_abs_path, app_beam_dir}
   end
+
+  @doc """
+  Get git commit id. Can be used to compare with previous coverage results (last commit).
+  """
+  def get_commit_id_from_file(path) do
+    {:ok, content} = File.read(path)
+    [_tag, app_rel_vsn, _pusher, _package] = String.split(content, ", ")
+    commit_id = String.split(app_rel_vsn, "-") |> List.last()
+    commit_id
+  end
 end
