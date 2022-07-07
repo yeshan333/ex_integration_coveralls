@@ -19,8 +19,8 @@ defmodule ExIntegrationCoveralls.CovStatsWorker do
 
   @impl true
   def handle_call({:stop_cov}, _from, state) do
-    ExIntegrationCoveralls.exit()
-    {:reply, state}
+    status = ExIntegrationCoveralls.exit()
+    {:reply, status, state}
   end
 
   @impl true
@@ -30,7 +30,7 @@ defmodule ExIntegrationCoveralls.CovStatsWorker do
   end
 
   @impl true
-  def handle_cast({:start_cov_push, %{"app_name" => app_name, "extend_params" => extend_params, "url" => url}}, state) do
+  def handle_cast({:start_cov_push, %{"app_name" => app_name, "extend_params" => extend_params, "url" => url} = state}, state) do
     ExIntegrationCoveralls.post_app_cov_to_ci(url, extend_params, app_name)
     {:reply, Map.put(state, :app_name, app_name)}
   end
