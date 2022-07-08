@@ -2,6 +2,7 @@ defmodule ExIntegrationCoveralls.CoverageCiPosterTest do
   use ExUnit.Case, async: false
   import Mock
   alias ExIntegrationCoveralls.Stats
+  alias ExIntegrationCoveralls.Poster
   alias ExIntegrationCoveralls.PathReader
   alias ExIntegrationCoveralls.CoverageCiPoster
 
@@ -54,19 +55,25 @@ defmodule ExIntegrationCoveralls.CoverageCiPosterTest do
     assert(CoverageCiPoster.stats_transformer(@cov_stats, @extends_params) == @transform_stats)
   end
 
-  test_with_mock "post stats to cover ci service", CoverageCiPoster,
-    get_coverage_stats: fn _, _ -> @cov_stats end,
-    stats_transformer: fn _, _ -> @transform_stats end,
-    post_stats_to_cover_ci: fn _, _, _, _ -> @response end do
-    url = "https://github.com"
+  test "post stats to cover ci service" do
+    with_mocks([
+      {Stats, [],
+       [
+         calculate_stats: fn _, _ -> @calc_stats end,
+         generate_coverage: fn _, _ -> @cov_stats end
+       ]},
+      {Poster, [], [post_to_coverage_services_center: fn _, _ -> @response end]}
+    ]) do
+      url = "https://github.com"
 
-    assert(
-      CoverageCiPoster.post_stats_to_cover_ci(
-        url,
-        @extends_params,
-        @compile_time_source_lib_abs_path,
-        @source_code_abs_path
-      ) == @response
-    )
+      assert(
+        CoverageCiPoster.post_stats_to_cover_ci(
+          url,
+          @extends_params,
+          @compile_time_source_lib_abs_path,
+          @source_code_abs_path
+        ) == @response
+      )
+    end
   end
 end
