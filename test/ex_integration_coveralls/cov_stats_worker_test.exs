@@ -33,20 +33,28 @@ defmodule ExIntegrationCoveralls.CovStatsWorkerTest do
     end
   end
 
-  test_with_mock "stop app cov", ExIntegrationCoveralls, exit: fn  -> :ok end do
+  test_with_mock "stop app cov", ExIntegrationCoveralls, exit: fn -> :ok end do
     {:ok, pid} = CovStatsWorker.start_link()
 
     result = GenServer.call(pid, {:stop_cov})
     assert(result == :ok)
   end
 
-  test_with_mock "app cov push to coverage ci", ExIntegrationCoveralls, post_app_cov_to_ci: fn _, _, _ -> @response end do
+  test_with_mock "app cov push to coverage ci", ExIntegrationCoveralls,
+    post_app_cov_to_ci: fn _, _, _ -> @response end do
     {:ok, pid} = CovStatsWorker.start_link()
 
     app_name = "explore_ast_app"
     extend_params = %{}
     url = "https://github.com"
-    result = GenServer.cast(pid, {:start_cov_push, %{"app_name" => app_name, "extend_params" => extend_params, "url" => url}})
+
+    result =
+      GenServer.cast(
+        pid,
+        {:start_cov_push,
+         %{"app_name" => app_name, "extend_params" => extend_params, "url" => url}}
+      )
+
     assert(result == :ok)
   end
 end
