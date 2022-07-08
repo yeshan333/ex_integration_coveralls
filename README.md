@@ -89,3 +89,16 @@ Note: Your application release package should include the source code. The gener
     ├── RELEASES
     └── start_erl.data
 ```
+
+## License
+
+Distributed under the MIT License. See [LICENSE](./LICENSE) for more information.
+
+## Acknowledgements
+
+Thanks for these awesome resources that were used during the development of the **ExIntegrationCoveralls**:
+
+- [Erlang cover](https://www.erlang.org/doc/man/cover.html#description)
+- [A brief introduction to BEAM](https://www.erlang.org/blog/a-brief-beam-primer/)
+- [excoveralls](https://github.com/parroty/excoveralls)
+- [BeamFile - A peek into the BEAM file](https://github.com/hrzndhrn/beam_file)
