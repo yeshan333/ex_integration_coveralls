@@ -1,11 +1,18 @@
 
+<a name="0.8.0"></a>
+## [0.8.0](https://github.com/yeshan333/ex_integration_coveralls/compare/0.6.0...0.8.0) (2022-07-10)
+
+### Feat
+
+* add a coverage stats GenServer worker ([#5](https://github.com/yeshan333/ex_integration_coveralls/issues/5))
+* add a http endpoint to get commit id (User-Domain) ([#3](https://github.com/yeshan333/ex_integration_coveralls/issues/3))
+
 <a name="0.6.0"></a>
 ## [0.6.0](https://github.com/yeshan333/ex_integration_coveralls/compare/0.5.0...0.6.0) (2022-07-02)
 
 ### Feat
 
 * add upload coverage trigger (http endpoint) ([#2](https://github.com/yeshan333/ex_integration_coveralls/issues/2))
-
 
 <a name="0.5.0"></a>
 ## [0.5.0](https://github.com/yeshan333/ex_integration_coveralls/compare/0.4.0...0.5.0) (2022-07-01)
