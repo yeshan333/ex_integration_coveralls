@@ -12,8 +12,6 @@ To run tests with coverage data, run the following command:
 
 ```shell
 mix test --cover --exclude real_cover
-# run all test cases
-mix test
 ```
 
 ## Installation
