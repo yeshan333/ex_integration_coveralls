@@ -4,7 +4,9 @@
 
 A library for run-time system code line-level coverage analysis. You can use it to evulate the intergration test coverage.
 
-> realistic practice: https://github.com/yeshan333/explore_ast_app/blob/main/examples/README.md
+> realistic practice:
+> - [en](https://github.com/yeshan333/explore_ast_app/blob/main/examples/README.md)
+> - [zh_hans 中文版](https://github.com/yeshan333/explore_ast_app/blob/main/examples/README_cn.md)
 
 ## Running Tests
 
