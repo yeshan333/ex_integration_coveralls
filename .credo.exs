@@ -13,7 +13,7 @@
       # Run any config using `mix credo -C <name>`. If no config name is given
       # "default" is used.
       #
-      name: "default",
+      name: "ex_integration_coveralls",
       #
       # These are the files included in the analysis:
       files: %{

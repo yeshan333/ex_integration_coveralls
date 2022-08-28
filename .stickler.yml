@@ -1,6 +1,7 @@
 ---
 linters:
   credo:
+    config-name: '.credo.exs'
 
 files:
   ignore:
