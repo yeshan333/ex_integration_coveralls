@@ -54,7 +54,8 @@ defmodule ExIntegrationCoveralls.MixProject do
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test},
       {:ex_doc, "~> 0.18", only: :dev},
-      {:excoveralls, "~> 0.13", only: :test}
+      {:excoveralls, "~> 0.13", only: :test},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 
