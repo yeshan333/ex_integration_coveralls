@@ -1,0 +1,10 @@
+---
+linters:
+  credo:
+
+files:
+  ignore:
+    - "test/*"
+
+review:
+  fail_on_comments: false
