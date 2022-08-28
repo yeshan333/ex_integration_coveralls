@@ -1,7 +1,7 @@
 ---
 linters:
   credo:
-    config-name: '.credo.exs'
+    config-name: 'ex_integration_coveralls'
 
 files:
   ignore:
