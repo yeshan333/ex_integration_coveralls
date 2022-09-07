@@ -180,7 +180,9 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
 
         assert conn.state == :sent
         assert conn.status == 200
-        assert conn.resp_body == "{\"commit_id\":\"43a9595\",\"branch\":\"main\",\"app_name\":\"foo\"}"
+
+        assert conn.resp_body ==
+                 "{\"commit_id\":\"43a9595\",\"branch\":\"main\",\"app_name\":\"foo\"}"
       end
     end
   end
