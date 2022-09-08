@@ -170,7 +170,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
          [
            get_app_cover_path: fn _ -> @app_cover_path end,
            expand_path: fn _, _ -> @run_time_source_lib_abs_path <> "/VERSION_INFO" end,
-           get_commit_id_and_branch_from_file: fn _ -> {"43a9595", "main"} end
+           get_commit_id_and_branch_from_file: fn _ -> {"702c1d15e59d87707dbd4676960238efc598f740", "main"} end
          ]}
       ]) do
         conn =
@@ -182,7 +182,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
         assert conn.status == 200
 
         assert conn.resp_body ==
-                 "{\"commit_id\":\"43a9595\",\"branch\":\"main\",\"app_name\":\"foo\"}"
+                 "{\"commit_id\":\"702c1d15e59d87707dbd4676960238efc598f740\",\"branch\":\"main\",\"app_name\":\"foo\"}"
       end
     end
   end

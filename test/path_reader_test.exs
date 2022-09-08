@@ -78,7 +78,7 @@ defmodule ExIntegrationCoveralls.PathReaderTest do
         PathReader.expand_path(@application_dir <> "/VERSION_INFO")
       )
 
-    assert(commit_id == "43a9595")
+    assert(commit_id == "702c1d15e59d87707dbd4676960238efc598f740")
     assert(branch == "main")
   end
 end
