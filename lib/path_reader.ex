@@ -50,7 +50,10 @@ defmodule ExIntegrationCoveralls.PathReader do
   """
   def get_commit_id_and_branch_from_file(path) do
     {:ok, content} = File.read(path)
-    [_tag, _app_rel_vsn, _pusher, _package, source_branch, full_commit_id] = String.split(content, ", ")
+
+    [_tag, _app_rel_vsn, _pusher, _package, source_branch, full_commit_id] =
+      String.split(content, ", ")
+
     commit_id = String.split(full_commit_id, "=") |> List.last() |> String.trim()
     branch = String.split(source_branch, "=") |> List.last() |> String.trim()
     {commit_id, branch}
