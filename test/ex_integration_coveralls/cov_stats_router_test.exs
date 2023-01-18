@@ -71,6 +71,17 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       assert conn.status == 200
       assert conn.resp_body == "OK"
     end
+
+    test_with_mock "foo app async", ExIntegrationCoveralls, start_app_cov: fn _ -> [ok: Foo] end do
+      conn =
+        :post
+        |> conn("/cov/start", %{:app_name => "foo", :use_async => true})
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "OK"
+    end
   end
 
   describe "total coverage" do

@@ -6,6 +6,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   alias ExIntegrationCoveralls.Json
   alias ExIntegrationCoveralls.PathReader
   alias ExIntegrationCoveralls.CoverageCiPoster
+  alias ExIntegrationCoveralls.CovStatsWorker
 
   plug(:match)
   plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
@@ -18,7 +19,13 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   post "/cov/start" do
     {status, _} =
       case conn.body_params do
-        %{"app_name" => app_name} -> {200, ExIntegrationCoveralls.start_app_cov(app_name)}
+        %{"app_name" => app_name} ->
+          use_async = Map.get(conn.body_params, "use_async", false)
+          case use_async do
+            true -> {200, GenServer.cast(CovStatsWorker, {:start_cov, app_name})}
+            _ -> {200, ExIntegrationCoveralls.start_app_cov(app_name)}
+          end
+
         _ -> {400, "bad request!"}
       end
 
