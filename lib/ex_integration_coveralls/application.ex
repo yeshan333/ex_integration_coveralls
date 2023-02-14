@@ -53,6 +53,6 @@ defmodule ExIntegrationCoveralls.Application do
   end
 
   def is_use_cov_worker?() do
-    Application.get_env(:cov_worker, :enable_cov_worker, false)
+    Application.get_env(:cov_worker, :enable_cov_worker, true)
   end
 end
