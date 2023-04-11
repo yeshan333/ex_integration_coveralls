@@ -21,12 +21,14 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
       case conn.body_params do
         %{"app_name" => app_name} ->
           use_async = Map.get(conn.body_params, "use_async", false)
+
           case use_async do
             true -> {200, GenServer.cast(CovStatsWorker, {:start_cov, app_name})}
             _ -> {200, ExIntegrationCoveralls.start_app_cov(app_name)}
           end
 
-        _ -> {400, "bad request!"}
+        _ ->
+          {400, "bad request!"}
       end
 
     send_resp(conn, status, "OK")

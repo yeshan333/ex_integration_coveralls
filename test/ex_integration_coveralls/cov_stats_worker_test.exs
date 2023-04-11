@@ -30,9 +30,9 @@ defmodule ExIntegrationCoveralls.CovStatsWorkerTest do
       with_mocks([
         {ExIntegrationCoveralls, [],
          [
-          start_app_cov: fn _ -> [ok: Hello] end
+           start_app_cov: fn _ -> [ok: Hello] end
          ]},
-         {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]}
+        {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]}
       ]) do
         pid = Process.whereis(CovStatsWorker)
 
@@ -45,9 +45,9 @@ defmodule ExIntegrationCoveralls.CovStatsWorkerTest do
       with_mocks([
         {ExIntegrationCoveralls, [],
          [
-          start_app_cov: fn _ -> [ok: Hello] end
+           start_app_cov: fn _ -> [ok: Hello] end
          ]},
-         {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]}
+        {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]}
       ]) do
         pid = Process.whereis(CovStatsWorker)
 
@@ -61,9 +61,9 @@ defmodule ExIntegrationCoveralls.CovStatsWorkerTest do
     with_mocks([
       {ExIntegrationCoveralls, [],
        [
-        exit: fn -> :ok  end
+         exit: fn -> :ok end
        ]},
-       {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]}
+      {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]}
     ]) do
       pid = Process.whereis(CovStatsWorker)
 
@@ -74,7 +74,7 @@ defmodule ExIntegrationCoveralls.CovStatsWorkerTest do
 
   test_with_mock "app cov push to coverage ci", ExIntegrationCoveralls,
     post_app_cov_to_ci: fn _, _, _ -> @response end do
-      pid = Process.whereis(CovStatsWorker)
+    pid = Process.whereis(CovStatsWorker)
 
     app_name = "explore_ast_app"
     extend_params = %{}
