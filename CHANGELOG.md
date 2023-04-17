@@ -1,4 +1,15 @@
 
+<a name="0.8.1"></a>
+## [0.8.1](https://github.com/yeshan333/ex_integration_coveralls/compare/0.8.0...0.8.1) (2023-04-18)
+
+### Feat
+
+* support async start app cov ([commit@515ccfd](https://github.com/yeshan333/ex_integration_coveralls/commit/515ccfd9b604ed5e14d83168134a3de598f1408e))
+
+### Fixed
+
+* beam file path search ([#8](https://github.com/yeshan333/ex_integration_coveralls/issues/8))
+
 <a name="0.8.0"></a>
 ## [0.8.0](https://github.com/yeshan333/ex_integration_coveralls/compare/0.6.0...0.8.0) (2022-07-10)
 
