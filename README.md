@@ -92,7 +92,7 @@ Note: Your application release package should include the source code. The gener
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](./LICENSE) for more information.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
 ## Acknowledgements
 
