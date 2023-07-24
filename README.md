@@ -1,6 +1,6 @@
 # ExIntegrationCoveralls
 
-[![Coverage Status](https://coveralls.io/repos/github/yeshan333/ex_integration_coveralls/badge.svg?branch=main)](https://coveralls.io/github/yeshan333/ex_integration_coveralls?branch=main) [![hex.pm version](https://img.shields.io/hexpm/v/ex_integration_coveralls.svg)](https://hex.pm/packages/ex_integration_coveralls) [![hex.pm downloads](https://img.shields.io/hexpm/dt/ex_integration_coveralls.svg)](https://hex.pm/packages/ex_integration_coveralls) [![hex.pm license](https://img.shields.io/hexpm/l/ex_integration_coveralls.svg)](https://coveralls.io/github/yeshan333/ex_integration_coveralls/blog/main/LICENSEs)
+[![Coverage Status](https://coveralls.io/repos/github/yeshan333/ex_integration_coveralls/badge.svg?branch=main)](https://coveralls.io/github/yeshan333/ex_integration_coveralls?branch=main) [![hex.pm version](https://img.shields.io/hexpm/v/ex_integration_coveralls.svg)](https://hex.pm/packages/ex_integration_coveralls) [![hex.pm downloads](https://img.shields.io/hexpm/dt/ex_integration_coveralls.svg)](https://hex.pm/packages/ex_integration_coveralls) [![hex.pm license](https://img.shields.io/hexpm/l/ex_integration_coveralls.svg)](https://github.com/yeshan333/ex_integration_coveralls/blog/main/LICENSE)
 
 A library for run-time system code line-level coverage analysis. You can use it to evaluate the intergration test coverage.
 
@@ -102,3 +102,4 @@ Thanks for these awesome resources that were used during the development of the 
 - [A brief introduction to BEAM](https://www.erlang.org/blog/a-brief-beam-primer/)
 - [excoveralls](https://github.com/parroty/excoveralls)
 - [BeamFile - A peek into the BEAM file](https://github.com/hrzndhrn/beam_file)
+- [The Elixir AST explorer - ast_ninja](https://github.com/arjan/ast_ninja)
