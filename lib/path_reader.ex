@@ -31,7 +31,9 @@ defmodule ExIntegrationCoveralls.PathReader do
     beam_file_path_list = File.ls!(app_beam_dir)
 
     beam_file_path =
-      Enum.filter(beam_file_path_list, fn filename -> String.ends_with?(filename, "beam") end)
+      Enum.filter(beam_file_path_list, fn filename ->
+        String.ends_with?(filename, "beam") and String.starts_with?(filename, "Elixir")
+      end)
       |> List.first()
 
     beam_file_abs_path = app_beam_dir <> "/" <> beam_file_path
