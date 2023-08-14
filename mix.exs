@@ -6,7 +6,7 @@ defmodule ExIntegrationCoveralls.MixProject do
   def project do
     [
       app: :ex_integration_coveralls,
-      version: "0.8.1",
+      version: "0.8.2",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
