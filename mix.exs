@@ -17,7 +17,7 @@ defmodule ExIntegrationCoveralls.MixProject do
       homepage_url: @source_url,
       docs: [
         main: "readme",
-        extras: ["README.md"]
+        extras: ["README.md", "LICENSE"]
       ],
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env:
