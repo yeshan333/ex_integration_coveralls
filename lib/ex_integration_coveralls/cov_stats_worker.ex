@@ -36,6 +36,6 @@ defmodule ExIntegrationCoveralls.CovStatsWorker do
         state
       ) do
     ExIntegrationCoveralls.post_app_cov_to_ci(url, extend_params, app_name)
-    {:reply, Map.put(state, :app_name, app_name)}
+    {:noreply, Map.put(state, :app_name, app_name)}
   end
 end

@@ -74,15 +74,16 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
     send_resp(conn, status, "OK")
   end
 
-  # User-defined, get commit to diff coverage data, compare with previous coverage
+  # User-defined, get commit to diff coverage data, compare with previous coverage.
+  # You can use it to calculate incremental coverage.
   get "/cov/commit_id/:app_name" do
     ## Hard Code ##
     {run_time_source_lib_abs_path, _, _} = PathReader.get_app_cover_path(app_name)
     # the path include app commit id info.
     # format like this:
     # TAG=hello-202210091408, APP_RELEASE_VERSION=hello-202210091408-43a9595, PUSHER=yeshan333, PACKAGE=yeshan333/hello/hello-202210091408-43a9595.tar.gz
-    commit_id =
-      PathReader.get_commit_id_from_file(
+    {commit_id, branch} =
+      PathReader.get_commit_id_and_branch_from_file(
         PathReader.expand_path("../../VERSION_INFO", run_time_source_lib_abs_path)
       )
 
@@ -90,7 +91,8 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
     body =
       Json.generate_json_output(%{
         app_name: app_name,
-        commit_id: commit_id
+        commit_id: commit_id,
+        branch: branch
       })
 
     send_resp(conn, 200, body)

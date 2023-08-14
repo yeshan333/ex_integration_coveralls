@@ -58,7 +58,7 @@ defmodule ExIntegrationCoveralls.CoverageCiPoster do
   - stats: get_coverage_stats() return value
   """
   def stats_transformer(stats, extends \\ %{}) do
-    # %{"lib/hello.ex" => %{ 1 => 3, 2 => 0, 3 => 1}}
+    # %{"lib/hello.ex" => %{ 1 => 3, 2 => 0, 3 => -1}}
     files_map =
       Enum.map(stats, fn item ->
         {file_path, line_cov_arr} = item
@@ -69,20 +69,20 @@ defmodule ExIntegrationCoveralls.CoverageCiPoster do
     Map.put_new(extends, :files, files_map)
   end
 
-  # Return value like this: {"lib/hello.ex", %{ 1 => 3, 2 => 0, 3 => 1}}
+  # Return value like this: {"lib/hello.ex", %{ 1 => 3, 2 => 0, 3 => -1}}
   defp file_coverage_map(file_path, line_cov_arr) do
     line_cov_map =
       Enum.with_index(line_cov_arr, fn element, index ->
-        [index + 1, transform_nil_to_zero(element)]
+        [index + 1, transform_nil_to_negative_one(element)]
       end)
       |> Map.new(fn [k, v] -> {k, v} end)
 
     {file_path, line_cov_map}
   end
 
-  defp transform_nil_to_zero(value) do
+  defp transform_nil_to_negative_one(value) do
     cond do
-      value == nil -> 0
+      value == nil -> -1
       value -> value
     end
   end

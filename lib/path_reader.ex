@@ -31,7 +31,9 @@ defmodule ExIntegrationCoveralls.PathReader do
     beam_file_path_list = File.ls!(app_beam_dir)
 
     beam_file_path =
-      Enum.filter(beam_file_path_list, fn filename -> String.ends_with?(filename, "beam") end)
+      Enum.filter(beam_file_path_list, fn filename ->
+        String.ends_with?(filename, "beam") and String.starts_with?(filename, "Elixir")
+      end)
       |> List.first()
 
     beam_file_abs_path = app_beam_dir <> "/" <> beam_file_path
@@ -52,10 +54,14 @@ defmodule ExIntegrationCoveralls.PathReader do
   @doc """
   Get git commit id. Can be used to compare with previous coverage results (last commit).
   """
-  def get_commit_id_from_file(path) do
+  def get_commit_id_and_branch_from_file(path) do
     {:ok, content} = File.read(path)
-    [_tag, app_rel_vsn, _pusher, _package] = String.split(content, ", ")
-    commit_id = String.split(app_rel_vsn, "-") |> List.last()
-    commit_id
+
+    [_tag, _app_rel_vsn, _pusher, _package, source_branch, full_commit_id] =
+      String.split(content, ", ")
+
+    commit_id = String.split(full_commit_id, "=") |> List.last() |> String.trim()
+    branch = String.split(source_branch, "=") |> List.last() |> String.trim()
+    {commit_id, branch}
   end
 end

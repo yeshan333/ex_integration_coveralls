@@ -11,8 +11,8 @@ defmodule ExIntegrationCoveralls.CoverageCiPosterTest do
   @calc_stats %{"lib/hello.ex" => %{1 => 0, 4 => 0, 5 => 1}}
   @cov_stats [{"lib/foo.ex", [nil, 0, nil, 0, nil, 1]}, {"lib/bar.ex", [1, 0, nil, 3, nil, 1]}]
   @cov_stats_map %{
-    "lib/bar.ex" => %{1 => 1, 2 => 0, 3 => 0, 4 => 3, 5 => 0, 6 => 1},
-    "lib/foo.ex" => %{1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 1}
+    "lib/bar.ex" => %{1 => 1, 2 => 0, 3 => -1, 4 => 3, 5 => -1, 6 => 1},
+    "lib/foo.ex" => %{1 => -1, 2 => 0, 3 => -1, 4 => 0, 5 => -1, 6 => 1}
   }
   @extends_params %{
     client: %{

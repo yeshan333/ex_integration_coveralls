@@ -48,9 +48,9 @@ defmodule ExIntegrationCoveralls.MixProject do
 
   defp deps do
     [
-      {:poison, "~> 5.0"},
+      {:poison, "~> 5.0 or ~> 4.0.1 or ~> 3.0"},
       {:httpoison, "~> 1.8"},
-      {:plug_cowboy, "~> 2.5"},
+      {:plug_cowboy, "~> 2.5 or ~> 2.0"},
       {:meck, "~> 0.8", only: :test},
       {:mock, "~> 0.3.6", only: :test},
       {:ex_doc, "~> 0.18", only: :dev},

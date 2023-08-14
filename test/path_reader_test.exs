@@ -73,11 +73,12 @@ defmodule ExIntegrationCoveralls.PathReaderTest do
   end
 
   test "read commit id" do
-    commit_id =
-      PathReader.get_commit_id_from_file(
+    {commit_id, branch} =
+      PathReader.get_commit_id_and_branch_from_file(
         PathReader.expand_path(@application_dir <> "/VERSION_INFO")
       )
 
-    assert(commit_id == "43a9595")
+    assert(commit_id == "702c1d15e59d87707dbd4676960238efc598f740")
+    assert(branch == "main")
   end
 end
