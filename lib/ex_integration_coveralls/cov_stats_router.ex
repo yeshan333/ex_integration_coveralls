@@ -4,6 +4,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   """
   use Plug.Router
   alias ExIntegrationCoveralls.Json
+  alias ExIntegrationCoveralls.Cover
   alias ExIntegrationCoveralls.PathReader
   alias ExIntegrationCoveralls.CoverageCiPoster
   alias ExIntegrationCoveralls.CovStatsWorker
@@ -40,6 +41,17 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
     body =
       Json.generate_json_output(%{
         coverage: total_cov
+      })
+
+    send_resp(conn, 200, body)
+  end
+
+  get "/cov/status" do
+    status = Cover.check_cover_status()
+
+    body =
+      Json.generate_json_output(%{
+        status: status
       })
 
     send_resp(conn, 200, body)

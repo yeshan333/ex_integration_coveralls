@@ -3,6 +3,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
   use Plug.Test
   import Mock
 
+  alias ExIntegrationCoveralls.Cover
   alias ExIntegrationCoveralls.PathReader
   alias ExIntegrationCoveralls.CovStatsRouter
   alias ExIntegrationCoveralls.CoverageCiPoster
@@ -102,6 +103,30 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert conn.resp_body == "{\"coverage\":50}"
+    end
+  end
+
+  describe "cover server status" do
+    test_with_mock "not_started", Cover, check_cover_status: fn -> :not_started end do
+      conn =
+        :get
+        |> conn("/cov/status", "")
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "{\"status\":\"not_started\"}"
+    end
+
+    test_with_mock "already_started", Cover, check_cover_status: fn -> :already_started end do
+      conn =
+        :get
+        |> conn("/cov/status", "")
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "{\"status\":\"already_started\"}"
     end
   end
 

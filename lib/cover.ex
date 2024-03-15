@@ -27,6 +27,16 @@ defmodule ExIntegrationCoveralls.Cover do
   end
 
   @doc """
+  Check the status of the cover server.
+  """
+  def check_cover_status do
+    case :cover.start() do
+      {:ok, _} -> :not_started
+      {:error, {:already_started, _}} -> :already_started
+    end
+  end
+
+  @doc """
   Returns the relative file path of the specified module for working directory.
   """
   def module_path(module) do

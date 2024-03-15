@@ -29,6 +29,14 @@ defmodule ExIntegrationCoveralls.CoverTest do
     assert(Cover.reset() == :ok)
   end
 
+  @tag :real_cover
+  test "check cover status" do
+    :cover.start()
+    assert(Cover.check_cover_status() == :already_started)
+    :cover.stop()
+    assert(Cover.check_cover_status() == :not_started)
+  end
+
   test "module path returns relative path for working directory" do
     assert(Cover.module_path(ExIntegrationCoveralls) == "lib/ex_integration_coveralls.ex")
   end
