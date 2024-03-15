@@ -1,0 +1,10 @@
+{
+    "image": "ghcr.io/yeshan333/erlang_elixir_asdf_ubuntu_container:latest",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "jakebecker.elixir-ls"
+            ]
+        }
+    }
+}
