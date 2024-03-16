@@ -46,7 +46,7 @@ Once your application is release, up and running. You only need the following th
 ExIntegrationCoveralls.start_app_cov("your_app_name")
 ```
 
-note: the `your_app_name` must exist in the return app list of  [:application.which_applications](https://www.erlang.org/doc/man/application.html#which_applications-0).
+Note: the `your_app_name` must exist in the return app list of  [:application.which_applications](https://www.erlang.org/doc/man/application.html#which_applications-0).
 
 - Step 3、Conduct external testing against the above application. Get run-time coverage or post coverage data to coverage system.
 
@@ -56,7 +56,7 @@ ExIntegrationCoveralls.get_app_total_cov("your_app_name")
 ExIntegrationCoveralls.post_app_cov_to_ci(url, extends, "your_app_name")
 ```
 
-Note: Your application release package should include the source code. The general structure is as follows:
+Note: Your application release package should include the source code. ExIntegrationCoveralls will use the source code to caculate coverage stats. The general structure is as follows:
 
 ```shell
 .
@@ -89,6 +89,8 @@ Note: Your application release package should include the source code. The gener
     ├── RELEASES
     └── start_erl.data
 ```
+
+Note: If you use the [distillery](https://github.com/bitwalker/distillery) to get OTP release, and config `set include_src: true`, then you can get the above structure. But if you use the Elixir origin `mix release`, this situation needs to be handled manually.
 
 ## License
 
