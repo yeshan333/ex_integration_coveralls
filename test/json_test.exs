@@ -33,12 +33,16 @@ defmodule ExIntegrationCoveralls.JsonTest do
   @json_source_transform_cov_result "{\"sloc\":2,\"misses\":1,\"hits\":1,\"files\":[{\"source\":[{\"source\":\"defmodule Test do\",\"coverage\":0},{\"source\":\"  def test do\",\"coverage\":1},{\"source\":\"  end\",\"coverage\":null},{\"source\":\"end\",\"coverage\":null}],\"sloc\":2,\"misses\":1,\"hits\":1,\"filename\":\"test/fixtures/test.ex\",\"coverage\":50}],\"coverage\":50}"
 
   test "json output - source info" do
-    assert(Json.generate_json_output(@source_info) |> Jason.decode!() == @json_source_info |> Jason.decode!())
+    assert(
+      Json.generate_json_output(@source_info) |> Jason.decode!() ==
+        @json_source_info |> Jason.decode!()
+    )
   end
 
   test "json output - transform cov result" do
     assert(
-      Json.generate_json_output(@source_transform_cov_result) |> Jason.decode!() == @json_source_transform_cov_result |> Jason.decode!()
+      Json.generate_json_output(@source_transform_cov_result) |> Jason.decode!() ==
+        @json_source_transform_cov_result |> Jason.decode!()
     )
   end
 end
