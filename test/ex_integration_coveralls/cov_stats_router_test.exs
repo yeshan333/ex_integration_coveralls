@@ -219,8 +219,8 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
         assert conn.state == :sent
         assert conn.status == 200
 
-        assert conn.resp_body ==
-                 "{\"commit_id\":\"702c1d15e59d87707dbd4676960238efc598f740\",\"branch\":\"main\",\"app_name\":\"foo\"}"
+        assert conn.resp_body |> Jason.decode!() ==
+                 "{\"commit_id\":\"702c1d15e59d87707dbd4676960238efc598f740\",\"branch\":\"main\",\"app_name\":\"foo\"}" |> Jason.decode!()
       end
     end
   end
