@@ -56,7 +56,11 @@ defmodule ExIntegrationCoveralls.MixProject do
       {:ex_doc, "~> 0.18", only: :dev},
       {:excoveralls, "~> 0.13", only: :test},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:husky, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:husky,
+       git: "https://github.com/HammamSamara/husky-elixir.git",
+       branch: "master",
+       only: [:dev, :test],
+       runtime: false}
     ]
   end
 
