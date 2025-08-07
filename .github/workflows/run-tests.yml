@@ -24,8 +24,8 @@ jobs:
       MIX_ENV: test
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v1.0.0
-      - uses: erlef/setup-beam@v1
+      - uses: actions/checkout@main
+      - uses: erlef/setup-beam@main
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
