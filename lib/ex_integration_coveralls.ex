@@ -33,6 +33,31 @@ defmodule ExIntegrationCoveralls do
   end
 
   @doc """
+  Get run-time env elxiir application total coverage with custom source directory path.
+
+  ## Parameters
+  - app_name: application name, It is a string.
+  - source_dir_path: custom source code directory path to use instead of deriving from app_name
+  """
+  def get_app_total_cov(app_name, source_dir_path) do
+    {_, compile_time_source_lib_abs_path, _} = PathReader.get_app_cover_path(app_name)
+
+    get_total_coverage(compile_time_source_lib_abs_path, source_dir_path)
+  end
+
+  @doc """
+  Get run-time env elxiir application total coverage with custom source directory paths.
+
+  ## Parameters
+  - app_name: application name, It is a string.
+  - compile_time_source_dir_path: custom compile-time source code directory path
+  - run_time_source_dir_path: custom run-time source code directory path
+  """
+  def get_app_total_cov(app_name, compile_time_source_dir_path, run_time_source_dir_path) do
+    get_total_coverage(compile_time_source_dir_path, run_time_source_dir_path)
+  end
+
+  @doc """
   Post run-time env elxiir application coverage to remote coverage service.
 
   ## Parameters
@@ -49,6 +74,45 @@ defmodule ExIntegrationCoveralls do
       extends_post_params,
       compile_time_source_lib_abs_path,
       run_time_source_lib_abs_path
+    )
+  end
+
+  @doc """
+  Post run-time env elxiir application coverage to remote coverage service with custom source directory path.
+
+  ## Parameters
+  - url: CI receive stats address
+  - extends_post_params: use to transform stats which CI service can acceptable form
+  - app_name: application name, It is a string.
+  - source_dir_path: custom source code directory path to use instead of deriving from app_name
+  """
+  def post_app_cov_to_ci(url, extends_post_params, app_name, source_dir_path) do
+    {_, compile_time_source_lib_abs_path, _} = PathReader.get_app_cover_path(app_name)
+
+    post_cov_stats_to_ud_ci(
+      url,
+      extends_post_params,
+      compile_time_source_lib_abs_path,
+      source_dir_path
+    )
+  end
+
+  @doc """
+  Post run-time env elxiir application coverage to remote coverage service with custom source directory paths.
+
+  ## Parameters
+  - url: CI receive stats address
+  - extends_post_params: use to transform stats which CI service can acceptable form
+  - app_name: application name, It is a string.
+  - compile_time_source_dir_path: custom compile-time source code directory path
+  - run_time_source_dir_path: custom run-time source code directory path
+  """
+  def post_app_cov_to_ci(url, extends_post_params, app_name, compile_time_source_dir_path, run_time_source_dir_path) do
+    post_cov_stats_to_ud_ci(
+      url,
+      extends_post_params,
+      compile_time_source_dir_path,
+      run_time_source_dir_path
     )
   end
 

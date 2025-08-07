@@ -95,6 +95,34 @@ defmodule ExIntegrationCoverallsTest do
     end
   end
 
+  test "get app total cov with custom source dir path" do
+    with_mocks([
+      {PathReader, [], [get_app_cover_path: fn _ -> @run_time_env_cov_path end]},
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]}
+    ]) do
+      custom_source_dir = "/custom/source/path"
+      assert(ExIntegrationCoveralls.get_app_total_cov("hello", custom_source_dir) == 50)
+    end
+  end
+
+  test "get app total cov with custom source dir paths" do
+    with_mocks([
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]}
+    ]) do
+      custom_compile_time_source_dir = "/custom/compile/time/path"
+      custom_run_time_source_dir = "/custom/run/time/path"
+      assert(ExIntegrationCoveralls.get_app_total_cov("hello", custom_compile_time_source_dir, custom_run_time_source_dir) == 50)
+    end
+  end
+
   test "post app total cov" do
     with_mocks([
       {PathReader, [], [get_app_cover_path: fn _ -> @run_time_env_cov_path end]},
@@ -114,6 +142,54 @@ defmodule ExIntegrationCoverallsTest do
 
       assert(
         ExIntegrationCoveralls.post_app_cov_to_ci(url, @extends_params, "hello") == @response
+      )
+    end
+  end
+
+  test "post app total cov with custom source dir path" do
+    with_mocks([
+      {PathReader, [], [get_app_cover_path: fn _ -> @run_time_env_cov_path end]},
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]},
+      {CoverageCiPoster, [],
+       [
+         get_coverage_stats: fn _, _ -> @cov_stats end,
+         stats_transformer: fn _, _ -> @transform_stats end,
+         post_stats_to_cover_ci: fn _, _, _, _ -> @response end
+       ]}
+    ]) do
+      url = "https://github.com"
+      custom_source_dir = "/custom/source/path"
+
+      assert(
+        ExIntegrationCoveralls.post_app_cov_to_ci(url, @extends_params, "hello", custom_source_dir) == @response
+      )
+    end
+  end
+
+  test "post app total cov with custom source dir paths" do
+    with_mocks([
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]},
+      {CoverageCiPoster, [],
+       [
+         get_coverage_stats: fn _, _ -> @cov_stats end,
+         stats_transformer: fn _, _ -> @transform_stats end,
+         post_stats_to_cover_ci: fn _, _, _, _ -> @response end
+       ]}
+    ]) do
+      url = "https://github.com"
+      custom_compile_time_source_dir = "/custom/compile/time/path"
+      custom_run_time_source_dir = "/custom/run/time/path"
+
+      assert(
+        ExIntegrationCoveralls.post_app_cov_to_ci(url, @extends_params, "hello", custom_compile_time_source_dir, custom_run_time_source_dir) == @response
       )
     end
   end
