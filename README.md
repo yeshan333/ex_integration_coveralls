@@ -56,6 +56,29 @@ ExIntegrationCoveralls.get_app_total_cov("your_app_name")
 ExIntegrationCoveralls.post_app_cov_to_ci(url, extends, "your_app_name")
 ```
 
+### Custom Source Directory Paths
+
+You can also specify custom source directory paths instead of deriving them from the app name:
+
+```shell
+# Get coverage with custom source directory path
+ExIntegrationCoveralls.get_app_total_cov("your_app_name", "/custom/source/path")
+
+# Get coverage with both custom compile-time and run-time source directory paths
+ExIntegrationCoveralls.get_app_total_cov("your_app_name", "/custom/compile/time/path", "/custom/run/time/path")
+
+# Post coverage with custom source directory path
+ExIntegrationCoveralls.post_app_cov_to_ci(url, extends, "your_app_name", "/custom/source/path")
+
+# Post coverage with both custom compile-time and run-time source directory paths
+ExIntegrationCoveralls.post_app_cov_to_ci(url, extends, "your_app_name", "/custom/compile/time/path", "/custom/run/time/path")
+```
+
+This feature is useful when:
+- Your source code is located in a non-standard location
+- You want to analyze coverage for a specific subset of your codebase
+- You need to specify different paths for compile-time and run-time environments
+
 Note: Your application release package should include the source code. ExIntegrationCoveralls will use the source code to caculate coverage stats. The general structure is as follows:
 
 ```shell
