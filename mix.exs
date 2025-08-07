@@ -20,6 +20,12 @@ defmodule ExIntegrationCoveralls.MixProject do
         extras: ["README.md", "LICENSE"]
       ],
       test_coverage: [tool: ExCoveralls],
+      releases: [
+        ex_integration_coveralls: [
+          strip_beams: [keep: ["Docs", "Dbgi"]],
+          applications: [runtime_tools: :permanent]
+        ]
+      ],
       preferred_cli_env:
         cli_env_for(:test, [
           "coveralls",
@@ -57,11 +63,6 @@ defmodule ExIntegrationCoveralls.MixProject do
       {:excoveralls, "~> 0.13", only: :test},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:junit_formatter, "~> 3.4", only: [:test]},
-      {:husky,
-       git: "https://github.com/HammamSamara/husky-elixir.git",
-       branch: "master",
-       only: [:dev, :test],
-       runtime: false}
     ]
   end
 
