@@ -63,6 +63,7 @@ defmodule ExIntegrationCoveralls.MixProject do
       {:excoveralls, "~> 0.13", only: :test},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:junit_formatter, "~> 3.4", only: [:test]},
+      {:castore, "~> 1.0"},
     ]
   end
 
