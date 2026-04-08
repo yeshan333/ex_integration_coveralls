@@ -22,8 +22,6 @@ jobs:
     defaults:
       run:
         working-directory: examples/release_demo
-    env:
-      MIX_ENV: prod
     steps:
       - uses: actions/checkout@main
       - uses: erlef/setup-beam@main
@@ -33,9 +31,13 @@ jobs:
 
       - name: Install dependencies
         run: mix deps.get
+        env:
+          MIX_ENV: prod
 
       - name: Build release (AC-1)
         run: mix release
+        env:
+          MIX_ENV: prod
 
       - name: Start release (AC-2)
         run: |
