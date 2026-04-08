@@ -27,3 +27,8 @@ ex_integration_coveralls-*.tar
 
 .elixir_ls
 .vscode
+
+# Examples build artifacts
+examples/*/deps/
+examples/*/_build/
+examples/*/mix.lock
