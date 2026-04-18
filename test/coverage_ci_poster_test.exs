@@ -1,6 +1,7 @@
 defmodule ExIntegrationCoveralls.CoverageCiPosterTest do
   use ExUnit.Case, async: false
   import Mock
+  alias ExIntegrationCoveralls.Cover
   alias ExIntegrationCoveralls.Stats
   alias ExIntegrationCoveralls.Poster
   alias ExIntegrationCoveralls.PathReader
@@ -72,6 +73,49 @@ defmodule ExIntegrationCoveralls.CoverageCiPosterTest do
           @extends_params,
           @compile_time_source_lib_abs_path,
           @source_code_abs_path
+        ) == @response
+      )
+    end
+  end
+
+  test "get coverage stats multi" do
+    with_mocks([
+      {Cover, [], [modules_for_compile_root: fn _ -> [Hello] end]},
+      {Stats, [],
+       [
+         calculate_stats: fn _, _ -> @calc_stats end,
+         generate_coverage: fn _, _ -> @cov_stats end
+       ]}
+    ]) do
+      path_pairs = [
+        {@compile_time_source_lib_abs_path, @source_code_abs_path}
+      ]
+
+      assert(CoverageCiPoster.get_coverage_stats_multi(path_pairs) == @cov_stats)
+    end
+  end
+
+  test "post stats to cover ci service multi" do
+    with_mocks([
+      {Cover, [], [modules_for_compile_root: fn _ -> [Hello] end]},
+      {Stats, [],
+       [
+         calculate_stats: fn _, _ -> @calc_stats end,
+         generate_coverage: fn _, _ -> @cov_stats end
+       ]},
+      {Poster, [], [post_to_coverage_services_center: fn _, _ -> @response end]}
+    ]) do
+      url = "https://github.com"
+
+      path_pairs = [
+        {@compile_time_source_lib_abs_path, @source_code_abs_path}
+      ]
+
+      assert(
+        CoverageCiPoster.post_stats_to_cover_ci_multi(
+          url,
+          @extends_params,
+          path_pairs
         ) == @response
       )
     end

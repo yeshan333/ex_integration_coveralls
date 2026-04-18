@@ -61,4 +61,64 @@ fi
 echo "PASS: /cov/status returned 200 with status 'already_started'"
 
 echo ""
+echo "=========================================="
+echo "=== Multi-app coverage (dep_apps)      ==="
+echo "=========================================="
+
+echo ""
+echo "=== Step 5: Start coverage with dep_apps ==="
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE_URL/cov/start" \
+  -H 'Content-Type: application/json' \
+  -d '{"app_name": "release_demo", "dep_apps": ["dep_lib"]}')
+if [ "$HTTP_CODE" != "200" ]; then
+  echo "FAIL: Expected HTTP 200 but got $HTTP_CODE"
+  exit 1
+fi
+RESPONSE=$(curl -s -X POST "$BASE_URL/cov/start" \
+  -H 'Content-Type: application/json' \
+  -d '{"app_name": "release_demo", "dep_apps": ["dep_lib"]}')
+if [ "$RESPONSE" != "OK" ]; then
+  echo "FAIL: Expected 'OK' but got '$RESPONSE'"
+  exit 1
+fi
+echo "PASS: /cov/start with dep_apps returned 200 with body 'OK'"
+
+echo ""
+echo "=== Step 6: Get total coverage with dep_apps ==="
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/cov/total/release_demo?dep_apps=dep_lib")
+if [ "$HTTP_CODE" != "200" ]; then
+  echo "FAIL: Expected HTTP 200 but got $HTTP_CODE"
+  exit 1
+fi
+RESPONSE=$(curl -s "$BASE_URL/cov/total/release_demo?dep_apps=dep_lib")
+if ! echo "$RESPONSE" | grep -q '"coverage"'; then
+  echo "FAIL: Response does not contain 'coverage' key: $RESPONSE"
+  exit 1
+fi
+echo "PASS: /cov/total with dep_apps returned 200 with coverage data: $RESPONSE"
+
+echo ""
+echo "=== Step 7: Get coverage report with dep_apps ==="
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/cov/report/release_demo?dep_apps=dep_lib")
+if [ "$HTTP_CODE" != "200" ]; then
+  echo "FAIL: Expected HTTP 200 but got $HTTP_CODE"
+  exit 1
+fi
+RESPONSE=$(curl -s "$BASE_URL/cov/report/release_demo?dep_apps=dep_lib")
+if ! echo "$RESPONSE" | grep -q '"files"'; then
+  echo "FAIL: Response does not contain 'files' key: $RESPONSE"
+  exit 1
+fi
+# Verify both apps appear in the report
+if ! echo "$RESPONSE" | grep -q 'release_demo'; then
+  echo "FAIL: Report does not contain release_demo files: $RESPONSE"
+  exit 1
+fi
+if ! echo "$RESPONSE" | grep -q 'dep_lib'; then
+  echo "FAIL: Report does not contain dep_lib files: $RESPONSE"
+  exit 1
+fi
+echo "PASS: /cov/report with dep_apps returned 200 with files from both apps"
+
+echo ""
 echo "=== All smoke tests passed! ==="

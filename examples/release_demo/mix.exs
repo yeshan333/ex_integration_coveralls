@@ -11,7 +11,8 @@ defmodule ReleaseDemo.MixProject do
       releases: [
         release_demo: [
           strip_beams: [keep: ["Docs", "Dbgi"]],
-          applications: [runtime_tools: :permanent]
+          applications: [runtime_tools: :permanent],
+          steps: [:assemble, &copy_app_sources/1]
         ]
       ]
     ]
@@ -24,9 +25,23 @@ defmodule ReleaseDemo.MixProject do
     ]
   end
 
+  # Copy source files into the release so that coverage analysis can read them at runtime.
+  # Without source files, Stats.generate_coverage cannot count lines per file.
+  defp copy_app_sources(release) do
+    release_lib = Path.join(release.path, "lib")
+
+    for {app, src} <- [{:release_demo, "lib"}, {:dep_lib, "../dep_lib/lib"}] do
+      [target] = Path.wildcard(Path.join(release_lib, "#{app}-*"))
+      File.cp_r!(src, Path.join(target, "lib"))
+    end
+
+    release
+  end
+
   defp deps do
     [
-      {:ex_integration_coveralls, path: "../.."}
+      {:ex_integration_coveralls, path: "../.."},
+      {:dep_lib, path: "../dep_lib"}
     ]
   end
 end

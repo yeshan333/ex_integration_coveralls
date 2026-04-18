@@ -52,6 +52,19 @@ defmodule ExIntegrationCoveralls.PathReader do
   end
 
   @doc """
+  Get application cover paths for multiple apps.
+
+  ## Parameters
+  - app_names: a list of application name strings.
+
+  ## Returns
+  A list of `{app_dir, compile_time_source_lib_abs_path, app_beam_dir}` tuples.
+  """
+  def get_apps_cover_paths(app_names) when is_list(app_names) do
+    Enum.map(app_names, &get_app_cover_path/1)
+  end
+
+  @doc """
   Get git commit id. Can be used to compare with previous coverage results (last commit).
   """
   def get_commit_id_and_branch_from_file(path) do
