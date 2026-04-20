@@ -323,6 +323,53 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
     end
   end
 
+  describe "cov start bad request" do
+    test "missing app_name returns 400" do
+      conn =
+        :post
+        |> conn("/cov/start", %{:foo => "bar"})
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 400
+    end
+  end
+
+  describe "cov push trigger with dep_apps" do
+    test_with_mock "foo app push with deps", ExIntegrationCoveralls,
+      post_app_cov_to_ci: fn _, _, _, _ -> @response end do
+      url = "https://github.com"
+
+      conn =
+        :post
+        |> conn("/cov/push_trigger", %{
+          :app_name => "foo",
+          :extend_params => @extends_params,
+          :url => url,
+          :dep_apps => ["bar"]
+        })
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "OK"
+    end
+  end
+
+  describe "total coverage without dep_apps query param" do
+    test_with_mock "foo app total cov with empty dep_apps", ExIntegrationCoveralls,
+      get_app_total_cov: fn _, _ -> 60 end do
+      conn =
+        :get
+        |> conn("/cov/total/foo?other_param=value", "")
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "{\"coverage\":60}"
+    end
+  end
+
   test "unknown route" do
     conn =
       :get

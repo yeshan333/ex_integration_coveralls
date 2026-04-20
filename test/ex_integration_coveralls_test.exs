@@ -254,4 +254,43 @@ defmodule ExIntegrationCoverallsTest do
       )
     end
   end
+
+  test "get app coverage report (get_coverage_report) with dep_apps" do
+    with_mocks([
+      {PathReader, [],
+       [
+         get_apps_cover_paths: fn _ ->
+           [
+             @run_time_env_cov_path,
+             @run_time_env_cov_path
+           ]
+         end
+       ]},
+      {Cover, [],
+       [modules_for_compile_root: fn _ -> [Hello] end]},
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]}
+    ]) do
+      # The get_app_coverage_report function is accessed via get_coverage_report_multi
+      path_pairs = [
+        {@compile_time_source_lib_abs_path, @application_dir},
+        {@compile_time_source_lib_abs_path, @application_dir}
+      ]
+
+      result = ExIntegrationCoveralls.get_coverage_report_multi(path_pairs)
+      assert result == @source_transform_cov_result
+    end
+  end
+
+  test_with_mock "post cov stats to ud ci", CoverageCiPoster,
+    post_stats_to_cover_ci: fn _, _, _, _ -> @response end do
+    url = "https://github.com"
+
+    assert(
+      ExIntegrationCoveralls.post_cov_stats_to_ud_ci(url, @extends_params) == @response
+    )
+  end
 end

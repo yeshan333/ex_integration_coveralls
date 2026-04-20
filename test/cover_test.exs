@@ -172,4 +172,33 @@ defmodule ExIntegrationCoveralls.CoverTest do
 
     Cover.stop()
   end
+
+  @tag :real_cover
+  test "has_compile_info?/2 with valid module and matching path returns true" do
+    _cover_modules = Cover.compile(PathReader.expand_path(@beam_file_path))
+
+    source_path =
+      ExIntegrationCoveralls.PathReader.base_path() <>
+        "/" <>
+        @source_file_path
+
+    assert Cover.has_compile_info?(Hello, source_path)
+    Cover.stop()
+  end
+
+  @tag :real_cover
+  test "compile with single path returns list" do
+    result = Cover.compile(PathReader.expand_path(@beam_file_path))
+    assert is_list(result)
+    assert {:ok, Hello} in result
+    Cover.stop()
+  end
+
+  test "modules_for_compile_root with no cover modules returns empty" do
+    # When no modules are compiled by cover, should return empty list
+    :cover.stop()
+    :cover.start()
+    assert Cover.modules_for_compile_root("/any/root") == []
+    :cover.stop()
+  end
 end
