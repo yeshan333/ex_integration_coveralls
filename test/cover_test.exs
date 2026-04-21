@@ -194,11 +194,8 @@ defmodule ExIntegrationCoveralls.CoverTest do
     Cover.stop()
   end
 
-  test "modules_for_compile_root with no cover modules returns empty" do
-    # When no modules are compiled by cover, should return empty list
-    :cover.stop()
-    :cover.start()
-    assert Cover.modules_for_compile_root("/any/root") == []
-    :cover.stop()
+  test "modules_for_compile_root with unmatched root returns empty" do
+    # A root that does not match any compiled module's source path should return []
+    assert Cover.modules_for_compile_root("/no/such/root/exists/here") == []
   end
 end
