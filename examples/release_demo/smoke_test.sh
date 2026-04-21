@@ -34,11 +34,12 @@ echo "PASS: /cov/start returned 200 with body 'OK'"
 
 echo ""
 echo "=== Step 2b: Exercise application code to generate non-zero coverage ==="
-# Call business-logic functions via the release's remote_eval to ensure lines are hit.
+# Call business-logic functions on the running release node so the live :cover
+# session records execution counts.
 RELEASE_BIN="_build/prod/rel/release_demo/bin/release_demo"
 if [ -x "$RELEASE_BIN" ]; then
-  "$RELEASE_BIN" eval 'ReleaseDemo.hello(); ReleaseDemo.add(1,2); ReleaseDemo.greet("world"); ReleaseDemo.square(3)' 2>/dev/null || true
-  "$RELEASE_BIN" eval 'DepLib.multiply(2,3); DepLib.reverse_string("abc"); DepLib.factorial(5)' 2>/dev/null || true
+  "$RELEASE_BIN" rpc 'ReleaseDemo.hello(); ReleaseDemo.add(1,2); ReleaseDemo.greet("world"); ReleaseDemo.square(3)' 2>/dev/null || true
+  "$RELEASE_BIN" rpc 'DepLib.multiply(2,3); DepLib.reverse_string("abc"); DepLib.factorial(5)' 2>/dev/null || true
 fi
 echo "PASS: Exercised application code"
 
@@ -102,8 +103,8 @@ echo "PASS: /cov/start with dep_apps returned 200 with body 'OK'"
 echo ""
 echo "=== Step 5b: Exercise code from both apps for non-zero coverage ==="
 if [ -x "$RELEASE_BIN" ]; then
-  "$RELEASE_BIN" eval 'ReleaseDemo.hello(); ReleaseDemo.add(2,3); ReleaseDemo.greet("test"); ReleaseDemo.square(4)' 2>/dev/null || true
-  "$RELEASE_BIN" eval 'DepLib.multiply(3,4); DepLib.reverse_string("hello"); DepLib.factorial(3)' 2>/dev/null || true
+  "$RELEASE_BIN" rpc 'ReleaseDemo.hello(); ReleaseDemo.add(2,3); ReleaseDemo.greet("test"); ReleaseDemo.square(4)' 2>/dev/null || true
+  "$RELEASE_BIN" rpc 'DepLib.multiply(3,4); DepLib.reverse_string("hello"); DepLib.factorial(3)' 2>/dev/null || true
 fi
 echo "PASS: Exercised both apps' code"
 
