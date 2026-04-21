@@ -27,6 +27,8 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
       - uses: erlef/setup-beam@main
         with:
           otp-version: ${{matrix.otp}}
