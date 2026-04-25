@@ -1,5 +1,5 @@
 defmodule ExIntegrationCoveralls.PathReaderTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   import Mock
   alias ExIntegrationCoveralls.PathReader
 
@@ -48,27 +48,18 @@ defmodule ExIntegrationCoveralls.PathReaderTest do
     assert(PathReader.expand_path("test", File.cwd!()) == File.cwd!() <> "/test")
   end
 
-  # test_with_mock "get app cover path", Application,
-  #   app_dir: fn _ -> PathReader.expand_path(@application_dir) end do
-  #   {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, app_beam_dir} =
-  #     PathReader.get_app_cover_path("ex_integration_coveralls")
-
-  #   assert(run_time_source_lib_abs_path == PathReader.expand_path("test/fixtures/hello"))
-  #   assert(compile_time_source_lib_abs_path == "/private/tmp/hello")
-  #   assert(app_beam_dir == PathReader.expand_path("test/fixtures/hello/ebin"))
-  # end
-
   test "get app cover path" do
-    with_mocks([
-      {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]},
-      {:beam_lib, [:unstick], [chunks: fn _, _ -> @beam_debug_info end]}
-    ]) do
+    # Use the real Application.app_dir and only mock :beam_lib to control compile-time path.
+    # Mocking Application is unsafe because it's a core OTP module used by Logger, ExUnit, etc.
+    app_dir = Application.app_dir(:ex_integration_coveralls)
+
+    with_mock :beam_lib, [:unstick], chunks: fn _, _ -> @beam_debug_info end do
       {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, app_beam_dir} =
         PathReader.get_app_cover_path("ex_integration_coveralls")
 
-      assert(run_time_source_lib_abs_path == PathReader.expand_path("test/fixtures/hello"))
+      assert(run_time_source_lib_abs_path == app_dir)
       assert(compile_time_source_lib_abs_path == "/private/tmp/hello")
-      assert(app_beam_dir == PathReader.expand_path("test/fixtures/hello/ebin"))
+      assert(app_beam_dir == app_dir <> "/ebin")
     end
   end
 
@@ -80,5 +71,25 @@ defmodule ExIntegrationCoveralls.PathReaderTest do
 
     assert(commit_id == "702c1d15e59d87707dbd4676960238efc598f740")
     assert(branch == "main")
+  end
+
+  test "get apps cover paths returns list of tuples" do
+    app_dir = Application.app_dir(:ex_integration_coveralls)
+
+    with_mock :beam_lib, [:unstick], chunks: fn _, _ -> @beam_debug_info end do
+      result =
+        PathReader.get_apps_cover_paths([
+          "ex_integration_coveralls",
+          "ex_integration_coveralls"
+        ])
+
+      assert length(result) == 2
+
+      Enum.each(result, fn {runtime, compile_time, beam_dir} ->
+        assert runtime == app_dir
+        assert compile_time == "/private/tmp/hello"
+        assert beam_dir == app_dir <> "/ebin"
+      end)
+    end
   end
 end

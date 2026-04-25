@@ -14,4 +14,11 @@ defmodule ReleaseDemo do
   def greet(name) do
     "Hello, #{name}!"
   end
+
+  @doc """
+  Demonstrates cross-app call: uses DepLib.multiply/2 from the dep_lib dependency.
+  """
+  def square(n) do
+    DepLib.multiply(n, n)
+  end
 end

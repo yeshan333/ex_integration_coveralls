@@ -280,4 +280,37 @@ defmodule ExIntegrationCoveralls.StatsTest do
     results = Stats.transform_cov(@fractional_source_info)
     assert(results.coverage == 66.7)
   end
+
+  test "trim_empty_prefix_and_suffix removes leading newline" do
+    assert Stats.trim_empty_prefix_and_suffix("\nhello") == "hello"
+  end
+
+  test "trim_empty_prefix_and_suffix removes trailing newline" do
+    assert Stats.trim_empty_prefix_and_suffix("hello\n") == "hello"
+  end
+
+  test "trim_empty_prefix_and_suffix removes both leading and trailing newlines" do
+    assert Stats.trim_empty_prefix_and_suffix("\nhello\n") == "hello"
+  end
+
+  test "trim_empty_prefix_and_suffix leaves inner newlines" do
+    assert Stats.trim_empty_prefix_and_suffix("hello\nworld") == "hello\nworld"
+  end
+
+  test "trim_empty_prefix_and_suffix with no newlines" do
+    assert Stats.trim_empty_prefix_and_suffix("hello") == "hello"
+  end
+
+  test "read_source reads and trims file content" do
+    source = Stats.read_source(PathReader.expand_path("test/fixtures/test.ex"))
+    assert is_binary(source)
+    refute String.starts_with?(source, "\n")
+    refute String.ends_with?(source, "\n")
+  end
+
+  test "get_source_line_count returns correct count" do
+    count = Stats.get_source_line_count(PathReader.expand_path("test/fixtures/test.ex"))
+    assert is_integer(count)
+    assert count > 0
+  end
 end

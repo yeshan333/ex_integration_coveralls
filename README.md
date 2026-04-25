@@ -1,5 +1,7 @@
 # ExIntegrationCoveralls
 
+[中文文档](README_CN.md)
+
 [![Coverage Status](https://coveralls.io/repos/github/yeshan333/ex_integration_coveralls/badge.svg?branch=main)](https://coveralls.io/github/yeshan333/ex_integration_coveralls?branch=main) [![hex.pm version](https://img.shields.io/hexpm/v/ex_integration_coveralls.svg)](https://hex.pm/packages/ex_integration_coveralls) [![hex.pm downloads](https://img.shields.io/hexpm/dt/ex_integration_coveralls.svg)](https://hex.pm/packages/ex_integration_coveralls) [![hex.pm license](https://img.shields.io/hexpm/l/ex_integration_coveralls.svg)](https://github.com/yeshan333/ex_integration_coveralls/blog/main/LICENSE)
 
 A library for run-time system code line-level coverage analysis. You can use it to evaluate the intergration test coverage.
@@ -90,7 +92,58 @@ Note: Your application release package should include the source code. ExIntegra
     └── start_erl.data
 ```
 
-Note: If you use the [distillery](https://github.com/bitwalker/distillery) to get OTP release, and config `set include_src: true`, then you can get the above structure. But if you use the Elixir origin `mix release`, this situation needs to be handled manually.
+Note: If you use the [distillery](https://github.com/bitwalker/distillery) to get OTP release, and config `set include_src: true`, then you can get the above structure. But if you use the Elixir origin `mix release`, this situation needs to be handled manually. See the [release demo](examples/release_demo) for a working example with a custom release step that copies source files automatically.
+
+## Multi-App Coverage (dep_apps)
+
+In real projects, business logic often lives in custom dependency libraries. You can collect coverage across your main app **and** its dependencies in a single session by passing the `dep_apps` option:
+
+```elixir
+# Start coverage for the main app and its dependencies
+ExIntegrationCoveralls.start_app_cov("my_app", dep_apps: ["shared_lib", "domain_logic"])
+
+# Get merged total coverage across all apps
+ExIntegrationCoveralls.get_app_total_cov("my_app", dep_apps: ["shared_lib", "domain_logic"])
+
+# Post merged coverage data to CI
+ExIntegrationCoveralls.post_app_cov_to_ci(url, extends, "my_app", dep_apps: ["shared_lib"])
+```
+
+The HTTP API also supports `dep_apps`:
+
+```bash
+# Start coverage with dependencies
+curl -X POST http://localhost:3333/cov/start \
+  -H 'Content-Type: application/json' \
+  -d '{"app_name": "my_app", "dep_apps": ["shared_lib"]}'
+
+# Get total coverage (comma-separated query param)
+curl http://localhost:3333/cov/total/my_app?dep_apps=shared_lib
+
+# Get detailed line-level report
+curl http://localhost:3333/cov/report/my_app?dep_apps=shared_lib
+```
+
+## Examples
+
+The [`examples/`](examples/) directory contains a complete working demo:
+
+| Directory | Description |
+|-----------|-------------|
+| [`examples/release_demo/`](examples/release_demo/) | Main OTP app demonstrating `mix release` integration with `ex_integration_coveralls`. Includes a smoke test script exercising all HTTP endpoints. |
+| [`examples/dep_lib/`](examples/dep_lib/) | A minimal dependency library used by `release_demo` to demonstrate multi-app coverage collection via `dep_apps`. |
+
+To try it out:
+
+```bash
+cd examples/release_demo
+mix deps.get
+MIX_ENV=prod mix release
+_build/prod/rel/release_demo/bin/release_demo daemon
+bash smoke_test.sh
+```
+
+See the [release demo README](examples/release_demo/README.md) for full details.
 
 ## License
 

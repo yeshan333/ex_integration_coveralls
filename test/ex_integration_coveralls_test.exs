@@ -141,4 +141,156 @@ defmodule ExIntegrationCoverallsTest do
     transform_cov: fn _ -> @source_transform_cov_result end do
     assert(ExIntegrationCoveralls.get_coverage_report() == @source_transform_cov_result)
   end
+
+  test "start app cov with dep_apps" do
+    with_mocks([
+      {PathReader, [],
+       [
+         get_apps_cover_paths: fn _ ->
+           [
+             @run_time_env_cov_path,
+             @run_time_env_cov_path
+           ]
+         end
+       ]},
+      {Cover, [], [compile: fn _ -> [ok: Hello, ok: Dep1] end]}
+    ]) do
+      result =
+        ExIntegrationCoveralls.start_app_cov("hello", dep_apps: ["dep1"])
+
+      assert(result == [ok: Hello, ok: Dep1])
+    end
+  end
+
+  test "get app total cov with dep_apps" do
+    with_mocks([
+      {PathReader, [],
+       [
+         get_apps_cover_paths: fn _ ->
+           [
+             @run_time_env_cov_path,
+             @run_time_env_cov_path
+           ]
+         end
+       ]},
+      {Cover, [],
+       [modules_for_compile_root: fn _ -> [Hello] end]},
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]}
+    ]) do
+      assert(
+        ExIntegrationCoveralls.get_app_total_cov("hello", dep_apps: ["dep1"]) == 50
+      )
+    end
+  end
+
+  test "post app cov to ci with dep_apps" do
+    with_mocks([
+      {PathReader, [],
+       [
+         get_apps_cover_paths: fn _ ->
+           [
+             @run_time_env_cov_path,
+             @run_time_env_cov_path
+           ]
+         end
+       ]},
+      {CoverageCiPoster, [],
+       [
+         post_stats_to_cover_ci_multi: fn _, _, _ -> @response end
+       ]}
+    ]) do
+      url = "https://github.com"
+
+      assert(
+        ExIntegrationCoveralls.post_app_cov_to_ci(
+          url,
+          @extends_params,
+          "hello",
+          dep_apps: ["dep1"]
+        ) == @response
+      )
+    end
+  end
+
+  test "get total coverage multi" do
+    with_mocks([
+      {Cover, [],
+       [modules_for_compile_root: fn _ -> [Hello] end]},
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]}
+    ]) do
+      path_pairs = [
+        {@compile_time_source_lib_abs_path, @application_dir}
+      ]
+
+      assert(ExIntegrationCoveralls.get_total_coverage_multi(path_pairs) == 50)
+    end
+  end
+
+  test "get coverage report multi" do
+    with_mocks([
+      {Cover, [],
+       [modules_for_compile_root: fn _ -> [Hello] end]},
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]}
+    ]) do
+      path_pairs = [
+        {@compile_time_source_lib_abs_path, @application_dir}
+      ]
+
+      assert(
+        ExIntegrationCoveralls.get_coverage_report_multi(path_pairs) ==
+          @source_transform_cov_result
+      )
+    end
+  end
+
+  test "get app coverage report (get_coverage_report) with dep_apps" do
+    with_mocks([
+      {PathReader, [],
+       [
+         get_apps_cover_paths: fn _ ->
+           [
+             @run_time_env_cov_path,
+             @run_time_env_cov_path
+           ]
+         end
+       ]},
+      {Cover, [],
+       [modules_for_compile_root: fn _ -> [Hello] end]},
+      {Stats, [],
+       [
+         transform_cov: fn _ -> @source_transform_cov_result end,
+         report: fn _, _, _ -> @stats_report end
+       ]}
+    ]) do
+      # The get_app_coverage_report function is accessed via get_coverage_report_multi
+      path_pairs = [
+        {@compile_time_source_lib_abs_path, @application_dir},
+        {@compile_time_source_lib_abs_path, @application_dir}
+      ]
+
+      result = ExIntegrationCoveralls.get_coverage_report_multi(path_pairs)
+      assert result == @source_transform_cov_result
+    end
+  end
+
+  test_with_mock "post cov stats to ud ci", CoverageCiPoster,
+    post_stats_to_cover_ci: fn _, _, _, _ -> @response end do
+    url = "https://github.com"
+
+    assert(
+      ExIntegrationCoveralls.post_cov_stats_to_ud_ci(url, @extends_params) == @response
+    )
+  end
 end

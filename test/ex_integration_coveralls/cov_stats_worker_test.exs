@@ -25,6 +25,19 @@ defmodule ExIntegrationCoveralls.CovStatsWorkerTest do
     :ok
   end
 
+  setup do
+    # Ensure the CovStatsWorker is running.
+    # It may have crashed from async cast tests (router tests send casts
+    # that are processed after mock teardown, crashing the GenServer).
+    # If the supervisor exceeded max_restarts, the whole app shuts down.
+    unless Process.whereis(CovStatsWorker) do
+      Application.stop(:ex_integration_coveralls)
+      Application.ensure_all_started(:ex_integration_coveralls)
+    end
+
+    :ok
+  end
+
   describe "start app cov" do
     test "call" do
       with_mocks([
@@ -73,7 +86,7 @@ defmodule ExIntegrationCoveralls.CovStatsWorkerTest do
   end
 
   test_with_mock "app cov push to coverage ci", ExIntegrationCoveralls,
-    post_app_cov_to_ci: fn _, _, _ -> @response end do
+    post_app_cov_to_ci: fn _, _, _, _ -> @response end do
     pid = Process.whereis(CovStatsWorker)
 
     app_name = "explore_ast_app"
@@ -85,6 +98,61 @@ defmodule ExIntegrationCoveralls.CovStatsWorkerTest do
         pid,
         {:start_cov_push,
          %{"app_name" => app_name, "extend_params" => extend_params, "url" => url}}
+      )
+
+    assert(result == :ok)
+  end
+
+  describe "start app cov with dep_apps" do
+    test "call with opts" do
+      with_mocks([
+        {ExIntegrationCoveralls, [],
+         [
+           start_app_cov: fn _, _ -> [ok: Hello, ok: Dep1] end
+         ]},
+        {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]}
+      ]) do
+        pid = Process.whereis(CovStatsWorker)
+
+        result = GenServer.call(pid, {:start_cov, "explore_ast_app", [dep_apps: ["dep1"]]})
+        assert(result == [ok: Hello, ok: Dep1])
+      end
+    end
+
+    test "cast with opts" do
+      with_mocks([
+        {ExIntegrationCoveralls, [],
+         [
+           start_app_cov: fn _, _ -> [ok: Hello, ok: Dep1] end
+         ]},
+        {Application, [], [app_dir: fn _ -> PathReader.expand_path(@application_dir) end]}
+      ]) do
+        pid = Process.whereis(CovStatsWorker)
+
+        result = GenServer.cast(pid, {:start_cov, "explore_ast_app", [dep_apps: ["dep1"]]})
+        assert(result == :ok)
+      end
+    end
+  end
+
+  test_with_mock "app cov push to coverage ci with dep_apps", ExIntegrationCoveralls,
+    post_app_cov_to_ci: fn _, _, _, _ -> @response end do
+    pid = Process.whereis(CovStatsWorker)
+
+    app_name = "explore_ast_app"
+    extend_params = %{}
+    url = "https://github.com"
+
+    result =
+      GenServer.cast(
+        pid,
+        {:start_cov_push,
+         %{
+           "app_name" => app_name,
+           "extend_params" => extend_params,
+           "url" => url,
+           "dep_apps" => ["dep1"]
+         }}
       )
 
     assert(result == :ok)

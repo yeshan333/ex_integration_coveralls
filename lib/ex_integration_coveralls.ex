@@ -12,11 +12,23 @@ defmodule ExIntegrationCoveralls do
 
   ## Parameters
   - app_name: application name, It is a string.
+  - opts: optional keyword list.
+    - dep_apps: list of dependency application name strings to include in coverage.
   """
-  def start_app_cov(app_name) do
-    {_, _, app_beam_dir} = PathReader.get_app_cover_path(app_name)
+  def start_app_cov(app_name, opts \\ []) do
+    dep_apps = Keyword.get(opts, :dep_apps, [])
 
-    execute(app_beam_dir)
+    case dep_apps do
+      [] ->
+        {_, _, app_beam_dir} = PathReader.get_app_cover_path(app_name)
+        execute(app_beam_dir)
+
+      dep_apps when is_list(dep_apps) ->
+        all_app_names = [app_name | dep_apps]
+        all_paths = PathReader.get_apps_cover_paths(all_app_names)
+        beam_dirs = Enum.map(all_paths, fn {_, _, beam_dir} -> beam_dir end)
+        execute(beam_dirs)
+    end
   end
 
   @doc """
@@ -24,12 +36,28 @@ defmodule ExIntegrationCoveralls do
 
   ## Parameters
   - app_name: application name, It is a string.
+  - opts: optional keyword list.
+    - dep_apps: list of dependency application name strings to include in coverage.
   """
-  def get_app_total_cov(app_name) do
-    {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, _} =
-      PathReader.get_app_cover_path(app_name)
+  def get_app_total_cov(app_name, opts \\ []) do
+    dep_apps = Keyword.get(opts, :dep_apps, [])
 
-    get_total_coverage(compile_time_source_lib_abs_path, run_time_source_lib_abs_path)
+    case dep_apps do
+      [] ->
+        {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, _} =
+          PathReader.get_app_cover_path(app_name)
+
+        get_total_coverage(compile_time_source_lib_abs_path, run_time_source_lib_abs_path)
+
+      dep_apps when is_list(dep_apps) ->
+        all_app_names = [app_name | dep_apps]
+        all_paths = PathReader.get_apps_cover_paths(all_app_names)
+
+        path_pairs =
+          Enum.map(all_paths, fn {runtime, compile_time, _} -> {compile_time, runtime} end)
+
+        get_total_coverage_multi(path_pairs)
+    end
   end
 
   @doc """
@@ -39,17 +67,33 @@ defmodule ExIntegrationCoveralls do
   - app_name: application name, It is a string.
   - url: CI receive stats address
   - extends_post_params: use to transform stats which CI service can acceptable form
+  - opts: optional keyword list.
+    - dep_apps: list of dependency application name strings to include in coverage.
   """
-  def post_app_cov_to_ci(url, extends_post_params, app_name) do
-    {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, _} =
-      PathReader.get_app_cover_path(app_name)
+  def post_app_cov_to_ci(url, extends_post_params, app_name, opts \\ []) do
+    dep_apps = Keyword.get(opts, :dep_apps, [])
 
-    post_cov_stats_to_ud_ci(
-      url,
-      extends_post_params,
-      compile_time_source_lib_abs_path,
-      run_time_source_lib_abs_path
-    )
+    case dep_apps do
+      [] ->
+        {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, _} =
+          PathReader.get_app_cover_path(app_name)
+
+        post_cov_stats_to_ud_ci(
+          url,
+          extends_post_params,
+          compile_time_source_lib_abs_path,
+          run_time_source_lib_abs_path
+        )
+
+      dep_apps when is_list(dep_apps) ->
+        all_app_names = [app_name | dep_apps]
+        all_paths = PathReader.get_apps_cover_paths(all_app_names)
+
+        path_pairs =
+          Enum.map(all_paths, fn {runtime, compile_time, _} -> {compile_time, runtime} end)
+
+        CoverageCiPoster.post_stats_to_cover_ci_multi(url, extends_post_params, path_pairs)
+    end
   end
 
   def execute(compiled_beam_dir_path) do
@@ -80,6 +124,23 @@ defmodule ExIntegrationCoveralls do
       |> Stats.report(compile_time_source_lib_abs_path, source_code_abs_path)
       |> Stats.transform_cov()
 
+    Map.get(stats, :coverage)
+  end
+
+  @doc """
+  Get an overall integration test coverage rate across multiple OTP applications.
+
+  ## Parameters
+  - path_pairs: list of `{compile_time_root, runtime_root}` tuples.
+  """
+  def get_total_coverage_multi(path_pairs) when is_list(path_pairs) do
+    all_source_info =
+      Enum.flat_map(path_pairs, fn {compile_time_root, runtime_root} ->
+        Cover.modules_for_compile_root(compile_time_root)
+        |> Stats.report(compile_time_root, runtime_root)
+      end)
+
+    stats = Stats.transform_cov(all_source_info)
     Map.get(stats, :coverage)
   end
 
@@ -125,6 +186,22 @@ defmodule ExIntegrationCoveralls do
       |> Stats.transform_cov()
 
     stats
+  end
+
+  @doc """
+  Get an overall integration test coverage analysis report across multiple OTP applications.
+
+  ## Parameters
+  - path_pairs: list of `{compile_time_root, runtime_root}` tuples.
+  """
+  def get_coverage_report_multi(path_pairs) when is_list(path_pairs) do
+    all_source_info =
+      Enum.flat_map(path_pairs, fn {compile_time_root, runtime_root} ->
+        Cover.modules_for_compile_root(compile_time_root)
+        |> Stats.report(compile_time_root, runtime_root)
+      end)
+
+    Stats.transform_cov(all_source_info)
   end
 
   @doc """

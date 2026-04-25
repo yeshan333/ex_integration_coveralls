@@ -62,7 +62,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       end
     end
 
-    test_with_mock "foo app", ExIntegrationCoveralls, start_app_cov: fn _ -> [ok: Foo] end do
+    test_with_mock "foo app", ExIntegrationCoveralls, start_app_cov: fn _, _ -> [ok: Foo] end do
       conn =
         :post
         |> conn("/cov/start", %{:app_name => "foo"})
@@ -73,7 +73,8 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       assert conn.resp_body == "OK"
     end
 
-    test_with_mock "foo app async", ExIntegrationCoveralls, start_app_cov: fn _ -> [ok: Foo] end do
+    test_with_mock "foo app async", ExIntegrationCoveralls,
+      start_app_cov: fn _, _ -> [ok: Foo] end do
       conn =
         :post
         |> conn("/cov/start", %{:app_name => "foo", :use_async => true})
@@ -94,7 +95,8 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       end
     end
 
-    test_with_mock "foo app total cov", ExIntegrationCoveralls, get_app_total_cov: fn _ -> 50 end do
+    test_with_mock "foo app total cov", ExIntegrationCoveralls,
+      get_app_total_cov: fn _, _ -> 50 end do
       conn =
         :get
         |> conn("/cov/total/foo", "")
@@ -173,7 +175,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
     end
 
     test_with_mock "foo app", ExIntegrationCoveralls,
-      post_app_cov_to_ci: fn _, _, _ -> @response end do
+      post_app_cov_to_ci: fn _, _, _, _ -> @response end do
       url = "https://github.com"
 
       conn =
@@ -223,6 +225,127 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
                  "{\"commit_id\":\"702c1d15e59d87707dbd4676960238efc598f740\",\"branch\":\"main\",\"app_name\":\"foo\"}"
                  |> Jason.decode!()
       end
+    end
+  end
+
+  describe "cov start with dep_apps" do
+    test_with_mock "foo app with deps", ExIntegrationCoveralls,
+      start_app_cov: fn _, _ -> [ok: Foo, ok: Bar] end do
+      conn =
+        :post
+        |> conn("/cov/start", %{:app_name => "foo", :dep_apps => ["bar"]})
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "OK"
+    end
+
+    test_with_mock "foo app with deps async", ExIntegrationCoveralls,
+      start_app_cov: fn _, _ -> [ok: Foo, ok: Bar] end do
+      conn =
+        :post
+        |> conn("/cov/start", %{
+          :app_name => "foo",
+          :dep_apps => ["bar"],
+          :use_async => true
+        })
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "OK"
+    end
+  end
+
+  describe "total coverage with dep_apps" do
+    test_with_mock "foo app total cov with deps", ExIntegrationCoveralls,
+      get_app_total_cov: fn _, _ -> 75 end do
+      conn =
+        :get
+        |> conn("/cov/total/foo?dep_apps=bar,baz", "")
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "{\"coverage\":75}"
+    end
+  end
+
+  describe "cov report with dep_apps" do
+    test "foo app cov report with deps" do
+      with_mocks([
+        {CoverageCiPoster, [],
+         [
+           get_coverage_stats_multi: fn _ -> @cov_stats end,
+           stats_transformer: fn _ -> @transform_stats end
+         ]},
+        {PathReader, [],
+         [
+           get_apps_cover_paths: fn _ ->
+             [
+               {"compile_path1", "run_time_path1", "app_dir1"},
+               {"compile_path2", "run_time_path2", "app_dir2"}
+             ]
+           end
+         ]}
+      ]) do
+        conn =
+          :get
+          |> conn("/cov/report/foo?dep_apps=bar", "")
+          |> CovStatsRouter.call(@opts)
+
+        assert conn.state == :sent
+        assert conn.status == 200
+        assert conn.resp_body == @report
+      end
+    end
+  end
+
+  describe "cov push trigger with dep_apps" do
+    test_with_mock "foo app with deps", ExIntegrationCoveralls,
+      post_app_cov_to_ci: fn _, _, _, _ -> @response end do
+      url = "https://github.com"
+
+      conn =
+        :post
+        |> conn("/cov/push_trigger", %{
+          :app_name => "foo",
+          :extend_params => @extends_params,
+          :url => url,
+          :dep_apps => ["bar"]
+        })
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "OK"
+    end
+  end
+
+  describe "cov start bad request" do
+    test "missing app_name returns 400" do
+      conn =
+        :post
+        |> conn("/cov/start", %{:foo => "bar"})
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 400
+    end
+  end
+
+  describe "total coverage without dep_apps query param" do
+    test_with_mock "foo app total cov with empty dep_apps", ExIntegrationCoveralls,
+      get_app_total_cov: fn _, _ -> 60 end do
+      conn =
+        :get
+        |> conn("/cov/total/foo?other_param=value", "")
+        |> CovStatsRouter.call(@opts)
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "{\"coverage\":60}"
     end
   end
 

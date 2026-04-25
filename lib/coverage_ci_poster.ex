@@ -69,6 +69,41 @@ defmodule ExIntegrationCoveralls.CoverageCiPoster do
     Map.put_new(extends, :files, files_map)
   end
 
+  @doc """
+  Post stats from multiple apps to coverage CI.
+
+  ## Parameters
+  - url: CI receive stats address
+  - extends_post_params: use to transform stats which CI service can acceptable form
+  - path_pairs: list of `{compile_time_root, runtime_root}` tuples.
+  """
+  def post_stats_to_cover_ci_multi(url, extends_post_params, path_pairs)
+      when is_list(path_pairs) do
+    stats =
+      get_coverage_stats_multi(path_pairs)
+      |> stats_transformer(extends_post_params)
+
+    body = Json.generate_json_output(stats)
+    Poster.post_to_coverage_services_center(url, body)
+  end
+
+  @doc """
+  Get coverage stats from multiple apps.
+
+  ## Parameters
+  - path_pairs: list of `{compile_time_root, runtime_root}` tuples.
+
+  ## Return
+  A merged list of `{file_path, line_coverage_array}` tuples from all apps.
+  """
+  def get_coverage_stats_multi(path_pairs) when is_list(path_pairs) do
+    Enum.flat_map(path_pairs, fn {compile_time_root, runtime_root} ->
+      Cover.modules_for_compile_root(compile_time_root)
+      |> Stats.calculate_stats(compile_time_root)
+      |> Stats.generate_coverage(runtime_root)
+    end)
+  end
+
   # Return value like this: {"lib/hello.ex", %{ 1 => 3, 2 => 0, 3 => -1}}
   defp file_coverage_map(file_path, line_cov_arr) do
     line_cov_map =

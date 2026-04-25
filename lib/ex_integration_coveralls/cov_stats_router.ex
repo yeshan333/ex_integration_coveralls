@@ -22,10 +22,12 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
       case conn.body_params do
         %{"app_name" => app_name} ->
           use_async = Map.get(conn.body_params, "use_async", false)
+          dep_apps = Map.get(conn.body_params, "dep_apps", [])
+          opts = build_opts(dep_apps)
 
           case use_async do
-            true -> {200, GenServer.cast(CovStatsWorker, {:start_cov, app_name})}
-            _ -> {200, ExIntegrationCoveralls.start_app_cov(app_name)}
+            true -> {200, GenServer.cast(CovStatsWorker, {:start_cov, app_name, opts})}
+            _ -> {200, ExIntegrationCoveralls.start_app_cov(app_name, opts)}
           end
 
         _ ->
@@ -36,7 +38,11 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   end
 
   get "/cov/total/:app_name" do
-    total_cov = ExIntegrationCoveralls.get_app_total_cov(app_name)
+    conn = Plug.Conn.fetch_query_params(conn)
+    dep_apps = parse_dep_apps_query(conn)
+    opts = build_opts(dep_apps)
+
+    total_cov = ExIntegrationCoveralls.get_app_total_cov(app_name, opts)
 
     body =
       Json.generate_json_output(%{
@@ -58,15 +64,31 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   end
 
   get "/cov/report/:app_name" do
-    {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, _} =
-      PathReader.get_app_cover_path(app_name)
+    conn = Plug.Conn.fetch_query_params(conn)
+    dep_apps = parse_dep_apps_query(conn)
 
     stats =
-      CoverageCiPoster.get_coverage_stats(
-        compile_time_source_lib_abs_path,
-        run_time_source_lib_abs_path
-      )
-      |> CoverageCiPoster.stats_transformer()
+      case dep_apps do
+        [] ->
+          {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, _} =
+            PathReader.get_app_cover_path(app_name)
+
+          CoverageCiPoster.get_coverage_stats(
+            compile_time_source_lib_abs_path,
+            run_time_source_lib_abs_path
+          )
+          |> CoverageCiPoster.stats_transformer()
+
+        dep_apps when is_list(dep_apps) ->
+          all_app_names = [app_name | dep_apps]
+          all_paths = PathReader.get_apps_cover_paths(all_app_names)
+
+          path_pairs =
+            Enum.map(all_paths, fn {runtime, compile_time, _} -> {compile_time, runtime} end)
+
+          CoverageCiPoster.get_coverage_stats_multi(path_pairs)
+          |> CoverageCiPoster.stats_transformer()
+      end
 
     body = Json.generate_json_output(stats)
     send_resp(conn, 200, body)
@@ -77,7 +99,9 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
     {status, _} =
       case conn.body_params do
         %{"app_name" => app_name, "extend_params" => extend_params, "url" => url} ->
-          {200, ExIntegrationCoveralls.post_app_cov_to_ci(url, extend_params, app_name)}
+          dep_apps = Map.get(conn.body_params, "dep_apps", [])
+          opts = build_opts(dep_apps)
+          {200, ExIntegrationCoveralls.post_app_cov_to_ci(url, extend_params, app_name, opts)}
 
         _ ->
           {400, "bad request!"}
@@ -113,4 +137,17 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   match _ do
     send_resp(conn, 404, "unknown route!")
   end
+
+  defp parse_dep_apps_query(conn) do
+    case conn.query_params do
+      %{"dep_apps" => dep_apps_str} when is_binary(dep_apps_str) ->
+        dep_apps_str |> String.split(",", trim: true) |> Enum.map(&String.trim/1)
+
+      _ ->
+        []
+    end
+  end
+
+  defp build_opts([]), do: []
+  defp build_opts(dep_apps) when is_list(dep_apps), do: [dep_apps: dep_apps]
 end
