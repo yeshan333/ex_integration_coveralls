@@ -156,6 +156,11 @@ echo "=========================================="
 echo "=== source_dir parameter support       ==="
 echo "=========================================="
 
+# Helper: percent-encode a string for use in a URL query parameter.
+urlencode() {
+  python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$1"
+}
+
 echo ""
 echo "=== Step 8: Discover release_demo source_dir ==="
 # The runtime source path is Application.app_dir(:release_demo), typically
@@ -170,13 +175,14 @@ echo "PASS: Detected source_dir=$SOURCE_DIR"
 
 echo ""
 echo "=== Step 9: Get total coverage with explicit source_dir ==="
+ENCODED_SOURCE_DIR=$(urlencode "$SOURCE_DIR")
 HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' \
-  "$BASE_URL/cov/total/release_demo?source_dir=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$SOURCE_DIR")")
+  "$BASE_URL/cov/total/release_demo?source_dir=$ENCODED_SOURCE_DIR")
 if [ "$HTTP_CODE" != "200" ]; then
   echo "FAIL: Expected HTTP 200 but got $HTTP_CODE"
   exit 1
 fi
-RESPONSE=$(curl -s "$BASE_URL/cov/total/release_demo?source_dir=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$SOURCE_DIR")")
+RESPONSE=$(curl -s "$BASE_URL/cov/total/release_demo?source_dir=$ENCODED_SOURCE_DIR")
 if ! echo "$RESPONSE" | grep -q '"coverage"'; then
   echo "FAIL: Response does not contain 'coverage' key: $RESPONSE"
   exit 1
@@ -191,12 +197,12 @@ echo "PASS: /cov/total with source_dir returned 200 with non-zero coverage ($COV
 echo ""
 echo "=== Step 10: Get coverage report with explicit source_dir ==="
 HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' \
-  "$BASE_URL/cov/report/release_demo?source_dir=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$SOURCE_DIR")")
+  "$BASE_URL/cov/report/release_demo?source_dir=$ENCODED_SOURCE_DIR")
 if [ "$HTTP_CODE" != "200" ]; then
   echo "FAIL: Expected HTTP 200 but got $HTTP_CODE"
   exit 1
 fi
-RESPONSE=$(curl -s "$BASE_URL/cov/report/release_demo?source_dir=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$SOURCE_DIR")")
+RESPONSE=$(curl -s "$BASE_URL/cov/report/release_demo?source_dir=$ENCODED_SOURCE_DIR")
 if ! echo "$RESPONSE" | grep -q '"files"'; then
   echo "FAIL: Response does not contain 'files' key: $RESPONSE"
   exit 1

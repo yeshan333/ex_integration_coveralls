@@ -44,6 +44,9 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
     opts = build_opts(dep_apps)
 
     total_cov =
+      # When source_dir is specified without dep_apps, use it as the runtime source path.
+      # Note: source_dir is not supported in multi-app (dep_apps) mode; the auto-detected
+      # paths are used for all apps in that case.
       case {dep_apps, source_dir} do
         {[], nil} ->
           ExIntegrationCoveralls.get_app_total_cov(app_name, opts)
@@ -86,6 +89,8 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
           {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, _} =
             PathReader.get_app_cover_path(app_name)
 
+          # Use source_dir as the runtime path when provided; falls back to the
+          # auto-detected app_dir. Note: source_dir is ignored in multi-app (dep_apps) mode.
           effective_runtime_path = source_dir || run_time_source_lib_abs_path
 
           CoverageCiPoster.get_coverage_stats(
