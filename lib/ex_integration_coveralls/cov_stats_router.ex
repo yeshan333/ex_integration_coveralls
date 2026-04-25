@@ -40,9 +40,18 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   get "/cov/total/:app_name" do
     conn = Plug.Conn.fetch_query_params(conn)
     dep_apps = parse_dep_apps_query(conn)
+    source_dir = parse_source_dir_query(conn)
     opts = build_opts(dep_apps)
 
-    total_cov = ExIntegrationCoveralls.get_app_total_cov(app_name, opts)
+    total_cov =
+      case {dep_apps, source_dir} do
+        {[], source_dir} when not is_nil(source_dir) ->
+          {_, compile_time_source_lib_abs_path, _} = PathReader.get_app_cover_path(app_name)
+          ExIntegrationCoveralls.get_total_coverage(compile_time_source_lib_abs_path, source_dir)
+
+        _ ->
+          ExIntegrationCoveralls.get_app_total_cov(app_name, opts)
+      end
 
     body =
       Json.generate_json_output(%{
@@ -66,6 +75,7 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
   get "/cov/report/:app_name" do
     conn = Plug.Conn.fetch_query_params(conn)
     dep_apps = parse_dep_apps_query(conn)
+    source_dir = parse_source_dir_query(conn)
 
     stats =
       case dep_apps do
@@ -73,9 +83,11 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
           {run_time_source_lib_abs_path, compile_time_source_lib_abs_path, _} =
             PathReader.get_app_cover_path(app_name)
 
+          effective_runtime_path = source_dir || run_time_source_lib_abs_path
+
           CoverageCiPoster.get_coverage_stats(
             compile_time_source_lib_abs_path,
-            run_time_source_lib_abs_path
+            effective_runtime_path
           )
           |> CoverageCiPoster.stats_transformer()
 
@@ -145,6 +157,16 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
 
       _ ->
         []
+    end
+  end
+
+  defp parse_source_dir_query(conn) do
+    case conn.query_params do
+      %{"source_dir" => source_dir} when is_binary(source_dir) and source_dir != "" ->
+        source_dir
+
+      _ ->
+        nil
     end
   end
 

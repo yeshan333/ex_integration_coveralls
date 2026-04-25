@@ -152,4 +152,60 @@ fi
 echo "PASS: /cov/report with dep_apps returned 200 with files from both apps"
 
 echo ""
+echo "=========================================="
+echo "=== source_dir parameter support       ==="
+echo "=========================================="
+
+echo ""
+echo "=== Step 8: Discover release_demo source_dir ==="
+# The runtime source path is Application.app_dir(:release_demo), typically
+# _build/prod/rel/release_demo/lib/release_demo-<version>
+SOURCE_DIR=$(ls -d _build/prod/rel/release_demo/lib/release_demo-* 2>/dev/null | head -1)
+if [ -z "$SOURCE_DIR" ]; then
+  echo "FAIL: Could not find release_demo source dir under _build/prod/rel/release_demo/lib/"
+  exit 1
+fi
+SOURCE_DIR=$(realpath "$SOURCE_DIR")
+echo "PASS: Detected source_dir=$SOURCE_DIR"
+
+echo ""
+echo "=== Step 9: Get total coverage with explicit source_dir ==="
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' \
+  "$BASE_URL/cov/total/release_demo?source_dir=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$SOURCE_DIR")")
+if [ "$HTTP_CODE" != "200" ]; then
+  echo "FAIL: Expected HTTP 200 but got $HTTP_CODE"
+  exit 1
+fi
+RESPONSE=$(curl -s "$BASE_URL/cov/total/release_demo?source_dir=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$SOURCE_DIR")")
+if ! echo "$RESPONSE" | grep -q '"coverage"'; then
+  echo "FAIL: Response does not contain 'coverage' key: $RESPONSE"
+  exit 1
+fi
+COVERAGE_WITH_SOURCE_DIR=$(echo "$RESPONSE" | grep -o '"coverage":[0-9.]*' | grep -o '[0-9.]*$')
+if [ -z "$COVERAGE_WITH_SOURCE_DIR" ] || [ "$COVERAGE_WITH_SOURCE_DIR" = "0" ]; then
+  echo "FAIL: Expected non-zero coverage with source_dir but got: $RESPONSE"
+  exit 1
+fi
+echo "PASS: /cov/total with source_dir returned 200 with non-zero coverage ($COVERAGE_WITH_SOURCE_DIR%): $RESPONSE"
+
+echo ""
+echo "=== Step 10: Get coverage report with explicit source_dir ==="
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' \
+  "$BASE_URL/cov/report/release_demo?source_dir=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$SOURCE_DIR")")
+if [ "$HTTP_CODE" != "200" ]; then
+  echo "FAIL: Expected HTTP 200 but got $HTTP_CODE"
+  exit 1
+fi
+RESPONSE=$(curl -s "$BASE_URL/cov/report/release_demo?source_dir=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$SOURCE_DIR")")
+if ! echo "$RESPONSE" | grep -q '"files"'; then
+  echo "FAIL: Response does not contain 'files' key: $RESPONSE"
+  exit 1
+fi
+if ! echo "$RESPONSE" | grep -q 'release_demo'; then
+  echo "FAIL: Report does not contain release_demo files: $RESPONSE"
+  exit 1
+fi
+echo "PASS: /cov/report with source_dir returned 200 with release_demo files"
+
+echo ""
 echo "=== All smoke tests passed! ==="

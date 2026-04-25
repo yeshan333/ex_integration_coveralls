@@ -106,6 +106,30 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       assert conn.status == 200
       assert conn.resp_body == "{\"coverage\":50}"
     end
+
+    test "foo app total cov with source_dir param" do
+      with_mocks([
+        {ExIntegrationCoveralls, [],
+         [
+           get_total_coverage: fn compile_path, runtime_path ->
+             assert runtime_path == "/custom/source/path"
+             assert compile_path == "run_time_path"
+             75
+           end
+         ]},
+        {PathReader, [],
+         [get_app_cover_path: fn _ -> {"compile_path", "run_time_path", "app_dir"} end]}
+      ]) do
+        conn =
+          :get
+          |> conn("/cov/total/foo?source_dir=/custom/source/path", "")
+          |> CovStatsRouter.call(@opts)
+
+        assert conn.state == :sent
+        assert conn.status == 200
+        assert conn.resp_body == "{\"coverage\":75}"
+      end
+    end
   end
 
   describe "cover server status" do
@@ -154,6 +178,31 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
         conn =
           :get
           |> conn("/cov/report/foo", "")
+          |> CovStatsRouter.call(@opts)
+
+        assert conn.state == :sent
+        assert conn.status == 200
+        assert conn.resp_body == @report
+      end
+    end
+
+    test "foo app cov report with source_dir param" do
+      with_mocks([
+        {CoverageCiPoster, [],
+         [
+           get_coverage_stats: fn compile_path, runtime_path ->
+             assert runtime_path == "/custom/source/path"
+             assert compile_path == "run_time_path"
+             @cov_stats
+           end,
+           stats_transformer: fn _ -> @transform_stats end
+         ]},
+        {PathReader, [],
+         [get_app_cover_path: fn _ -> {"compile_path", "run_time_path", "app_dir"} end]}
+      ]) do
+        conn =
+          :get
+          |> conn("/cov/report/foo?source_dir=/custom/source/path", "")
           |> CovStatsRouter.call(@opts)
 
         assert conn.state == :sent
