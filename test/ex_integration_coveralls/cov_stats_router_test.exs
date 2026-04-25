@@ -111,14 +111,18 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       with_mocks([
         {ExIntegrationCoveralls, [],
          [
-           get_total_coverage: fn compile_path, runtime_path ->
-             assert runtime_path == "/custom/source/path"
-             assert compile_path == "run_time_path"
+           get_total_coverage: fn ct_path, rt_path ->
+             assert ct_path == "compile_time_path"
+             assert rt_path == "/custom/source/path"
              75
            end
          ]},
         {PathReader, [],
-         [get_app_cover_path: fn _ -> {"compile_path", "run_time_path", "app_dir"} end]}
+         [
+           get_app_cover_path: fn _ ->
+             {"app_runtime_dir", "compile_time_path", "app_beam_dir"}
+           end
+         ]}
       ]) do
         conn =
           :get
@@ -190,15 +194,19 @@ defmodule ExIntegrationCoveralls.CovStatsRouterTest do
       with_mocks([
         {CoverageCiPoster, [],
          [
-           get_coverage_stats: fn compile_path, runtime_path ->
-             assert runtime_path == "/custom/source/path"
-             assert compile_path == "run_time_path"
+           get_coverage_stats: fn ct_path, rt_path ->
+             assert ct_path == "compile_time_path"
+             assert rt_path == "/custom/source/path"
              @cov_stats
            end,
            stats_transformer: fn _ -> @transform_stats end
          ]},
         {PathReader, [],
-         [get_app_cover_path: fn _ -> {"compile_path", "run_time_path", "app_dir"} end]}
+         [
+           get_app_cover_path: fn _ ->
+             {"app_runtime_dir", "compile_time_path", "app_beam_dir"}
+           end
+         ]}
       ]) do
         conn =
           :get

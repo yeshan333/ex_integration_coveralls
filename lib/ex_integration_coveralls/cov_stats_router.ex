@@ -45,7 +45,10 @@ defmodule ExIntegrationCoveralls.CovStatsRouter do
 
     total_cov =
       case {dep_apps, source_dir} do
-        {[], source_dir} when not is_nil(source_dir) ->
+        {[], nil} ->
+          ExIntegrationCoveralls.get_app_total_cov(app_name, opts)
+
+        {[], _} ->
           {_, compile_time_source_lib_abs_path, _} = PathReader.get_app_cover_path(app_name)
           ExIntegrationCoveralls.get_total_coverage(compile_time_source_lib_abs_path, source_dir)
 
